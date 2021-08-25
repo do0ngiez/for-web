@@ -30,7 +30,7 @@ db.collection("users").get().then((querySnapshot) => {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'BlueDu', data: data });
+  res.render('index', { title: 'BlueDu', layout: '../layouts/not-auth', data: data });
 });
 
 module.exports = router;
