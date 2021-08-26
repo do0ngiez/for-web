@@ -1,6 +1,6 @@
 var createError = require("http-errors");
 var express = require("express");
-var expressLayouts = require('express-ejs-layouts')
+var expressLayouts = require("express-ejs-layouts");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
@@ -26,8 +26,8 @@ const app = express();
 app.use(connectLiveReload());
 
 // view engine setup
-app.use(expressLayouts)
-app.set('layout', '../layouts/common')
+app.use(expressLayouts);
+app.set("layout", "../layouts/common");
 app.set("view engine", "ejs");
 
 app.use(logger("dev"));
