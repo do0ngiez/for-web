@@ -34,7 +34,6 @@ db.collection("users")
 router.get("/", function (req, res, next) {
   res.render("index", {
     title: "BlueDu",
-    // layout: "../layouts/not-auth",
     data: data,
     auth: false,
     pageName: "index",
