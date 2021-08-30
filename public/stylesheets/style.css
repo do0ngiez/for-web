@@ -15,3 +15,97 @@ footer {
   max-height: 160px;
   box-shadow: 0 20px 50px 0 rgb(0 0 0 / 25%);
 }
+
+.bg-addu {
+  background-color: #08228d !important;
+  color: white;
+}
+
+.btn-outline-addu {
+  color: #08228d;
+  border-color: #08228d;
+}
+
+.bg-adduDark {
+  background-color: #143b5c !important;
+  color: white;
+  padding: 2%;
+}
+
+.bg-adduLight {
+  background-color: #0066ab !important;
+  color: white;
+  padding: 2%;
+}
+
+.color-adduOrange {
+  color: #f98500;
+}
+
+.bg-adduOrange {
+  background-color: #f98500 !important;
+  color: white;
+}
+
+.bg-adduYorange {
+  background-color: #ffd491 !important;
+  padding: 2%;
+}
+
+
+a.bg-addu:hover,
+a.bg-addu:focus,
+button.bg-addu:hover,
+button.bg-addu:focus,
+input.bg-addu:hover,
+input.bg-addu:focus {
+  background-color: #0d2dad !important;
+  color: #bdbcbc;
+}
+
+.badge-addu {
+  color: #08228d;
+  background: none; 
+}
+
+.background {
+  margin: 10% 0% 3% 0%;
+  width: 80%;
+  padding: 2%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.contents2 {
+  margin: 3% 55% 3% 28%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.contents3 {
+  margin: 8% 0% 1% 1%;
+  text-align: center;
+  font-size: 17pt;
+}
+
+.news {
+  margin: 1rem 0%;
+  color: #ff7300;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #cac6c6;
+}
+
+.news2 {
+  margin: 15% 0% 2%;
+  color: #ff7300;
+  font-size: 1.5rem;
+}
+
+.tweet {
+  margin: 1rem;
+  color: #6e0909;
+}
+
+.feed {
+  width: 100%;
+}

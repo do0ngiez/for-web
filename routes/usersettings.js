@@ -3,7 +3,7 @@ var router = express.Router();
 
 router.get("/", function (req, res, next) {
   res.render("usersettings", {
-    title: "User Settings",
+    title: "Settings",
     auth: true,
     pageName: "usersettings",
   });
