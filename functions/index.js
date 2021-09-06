@@ -213,9 +213,9 @@ app.post("/login", async function (request, response) {
         encrypted.toString("hex").toUpperCase()
     ) {
       request.session.user = user;
-      response.redirect(`/?message=Hello ${user.firstName} ${user.lastName}.`);
+      response.redirect(`/?message=Hello, ${user.firstName} ${user.lastName}.`);
     } else {
-      response.redirect(`/?message=Invalid credentials!`);
+      response.redirect(`/?message=Invalid credentials! Please contact someone.`);
     }
   }
 });
