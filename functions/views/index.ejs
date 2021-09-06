@@ -1,4 +1,10 @@
+<%- include('./partials/_top') %>
+
 <div class="container">
+  <% if (message) { %>
+  <h4><%= message %></h4>
+  <% } %>
+
   <div class="logo mt-3">
     <img class="rounded" src="images/SealMoodleDaigler.png" alt="" />
   </div>
@@ -88,3 +94,5 @@
     </div>
   </div>
 </div>
+
+<%- include('./partials/_bottom') %>
