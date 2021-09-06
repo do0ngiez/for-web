@@ -23,13 +23,7 @@ const firebaseConfig = {
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-async function getUsers() {
-  let data = [];
-  const ref = firebaseApp.firestore().collection("users");//get table
-  await ref.get().then((snap) => snap.forEach((doc) => data.push(doc.data())));
-  return data;
-}
-
+// ADMIN
 async function getAdmins() {
   let data = [];
   const ref = firebaseApp.firestore().collection("admins");
@@ -71,6 +65,40 @@ async function updateAdmin(id, data) {
   await ref.doc(id).update(data);
 }
 
+// USERS AREA
+async function getUsers() {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("users");
+  await ref.get().then((snap) =>
+    snap.forEach((doc) => {
+      const entry = doc.data();
+      entry.id = doc.id;
+      data.push(entry);
+    })
+  );
+  return data;
+}
+
+async function getUserById(id) {
+  let data = null;
+  const ref = firebaseApp.firestore().collection("users");
+  await ref
+    .doc(id)
+    .get()
+    .then((doc) => {
+      data = doc.data();
+      data.id = id;
+    });
+  return data;
+}
+
+async function updateUser(id, data) {
+  const ref = firebaseApp.firestore().collection("users");
+  await ref.doc(id).update(data);
+}
+
+/////////////////////
+
 const app = express();
 app.engine("hbs", engines.ejs);
 app.set("views", "./views");
@@ -102,21 +130,13 @@ function checkSignIn(req, res, next) {
   }
 }
 
-// pages
+// PAGES AREA
 app.get("/", (request, response) => {
   response.render("index", {
     title: "BlueDu",
     pageName: "",
     currentUser: request.session.user,
     message: request.query.message,
-  });
-});
-
-app.get("/about", (request, response) => {
-  response.render("about", {
-    title: "About",
-    pageName: "about",
-    currentUser: request.session.user,
   });
 });
 
@@ -128,11 +148,20 @@ app.get("/archived", checkSignIn, (request, response) => {
   });
 });
 
-app.get("/dashboard", checkSignIn, (request, response) => {
+app.get("/dashboard", checkSignIn, async (request, response) => {
+  const users = await getUsers();
+  // console.log(users); ---user checker
+  let selectedUser = null;
+  if (request.query.id){
+    selectedUser = await getUserById(request.query.id);
+  }
   response.render("dashboard", {
     title: "Dashboard",
     pageName: "dashboard",
     currentUser: request.session.user,
+    users,
+    selectedUser,
+    message: request.query.message,
   });
 });
 
@@ -152,6 +181,8 @@ app.get("/usersettings", checkSignIn, async (request, response) => {
   });
 });
 
+
+///ADMINS
 app.post(
   "/updateAdminDetails",
   checkSignIn,
@@ -207,6 +238,22 @@ app.post(
   }
 );
 
+///USERS
+app.post(
+  "/updateUserDetails",
+  checkSignIn,
+  async function (request, response) {
+    await updateUser(request.body.id, {
+      firstName: request.body.firstName,
+      lastName: request.body.lastName,
+      durationOfContact: request.body.durationOfContact,
+    });
+
+    response.redirect(`/dashboard?message=Details successfully updated.`);
+  }
+);
+
+
 app.post("/login", async function (request, response) {
   if (!request.body.username || !request.body.password) {
     response.redirect(`/?message=Please enter both username and password.`);
@@ -223,7 +270,7 @@ app.post("/login", async function (request, response) {
         //hexadecimal
     ) {
       request.session.user = user;
-      response.redirect(`/?message=Hello, ${user.firstName} ${user.lastName}.`);
+      response.redirect(`/`);
     } else {
       response.redirect(`/?message=Invalid credentials! Please contact someone.`);
     }
@@ -233,12 +280,6 @@ app.post("/login", async function (request, response) {
 app.get("/logout", function (request, response) {
   request.session.destroy();
   response.redirect("/");
-});
-
-// api
-app.get("/api/users", checkSignIn, async (request, response) => {
-  const users = await getUsers();
-  response.json(users);
 });
 
 exports.app = functions.https.onRequest(app);

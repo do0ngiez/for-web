@@ -29,39 +29,38 @@
                     <a class="nav-link <%= pageName === 'dashboard' && 'active' %>" href="/dashboard">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= pageName === 'about' && 'active' %>" href="/about">About</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        More Options
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/archived">Archived Data</a>
-                        <a class="dropdown-item" href="#">Data Report</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/usersettings">User Settings</a>
-                    </div>
+                    <a class="nav-link <%= pageName === 'archived' && 'active' %>" href="/archived">Archive</a>
                 </li>
                 <% } else { %>
                 <li class="nav-item">
                     <a class="nav-link <%= pageName === '' && 'active' %>" href="/">Index</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link <%= pageName === 'about' && 'active' %>" href="/about">About</a>
-                </li>
+                </li> -->
                 <% } %>
             </ul>
-            <!-- Logout -->
-            <% if (currentUser) { %>
-            <a class="btn btn-outline-light my-2 my-sm-0" style="width: 120px;" href="/logout">
-                Logout
-            </a>
-            <% } else { %>
+            <!-- LOGIN!! -->
+            <% if (!currentUser) { %>
             <button type="button" class="btn btn-outline-light my-2 my-sm-0" style="width: 120px;" data-toggle="modal"
                 data-target="#loginModal">
                 Login
             </button>
+            <% } else { %>
+             <span class="color-adduOrange">Hi,</span>
+             <ul class="navbar-nav dropdown" style="padding-right: 2rem;">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="color-adduOrange"><%= currentUser.firstName %> <%= currentUser.lastName %></span> <!-- concat name!! :) -->
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                         <a class="dropdown-item"href="/usersettings">User Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout">Logout</a>
+                    </div>
+                </li>
+             </ul>
             <% } %>
         </div>
     </nav>
