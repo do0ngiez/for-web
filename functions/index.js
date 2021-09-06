@@ -2,12 +2,13 @@ const functions = require("firebase-functions");
 const firebase = require("firebase-admin");
 const express = require("express");
 const session = require("express-session");
+const { FirestoreStore } = require('@google-cloud/connect-firestore');//connection to cloud firestore
 const engines = require("consolidate");
 const crypto = require("crypto");
 
-const algorithm = "aes-256-cbc";
-const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE";
-const iv = "9ONZu9SfCNbW5ffk";
+const algorithm = "aes-256-cbc"; //cypherblock thing
+const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE"; //random 32 
+const iv = "9ONZu9SfCNbW5ffk";//initialization vector -- still for encryption
 
 // firebase
 const firebaseConfig = {
@@ -24,7 +25,7 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 async function getUsers() {
   let data = [];
-  const ref = firebaseApp.firestore().collection("users");
+  const ref = firebaseApp.firestore().collection("users");//get table
   await ref.get().then((snap) => snap.forEach((doc) => data.push(doc.data())));
   return data;
 }
@@ -80,13 +81,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: "HZRJv39tRqf9tLsgGRjg",
+    //connection to cloud firestore!
+    store: new FirestoreStore({
+      dataset: firebaseApp.firestore(),
+      kind: 'express-sessions',
+    }),
+    name: '__session',
+    secret: 'HZRJv39tRqf9tLsgGRjg',//random, encryption for sessions
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-      // secure: true,
-    },
   })
 );
 
@@ -190,6 +193,7 @@ app.post(
       response.redirect(`/usersettings?message=Passwords does not match!`);
     }
     else {
+      //encryption for pass update
       const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
       let encrypted = cipher.update(request.body.newPassword);
       encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -208,6 +212,7 @@ app.post("/login", async function (request, response) {
     response.redirect(`/?message=Please enter both username and password.`);
   } else {
     const user = await getAdminByUsername(request.body.username);
+    //password encryption
     const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
     let encrypted = cipher.update(request.body.password);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -215,6 +220,7 @@ app.post("/login", async function (request, response) {
       user &&
       user.passwordHash.toUpperCase() ===
         encrypted.toString("hex").toUpperCase()
+        //hexadecimal
     ) {
       request.session.user = user;
       response.redirect(`/?message=Hello, ${user.firstName} ${user.lastName}.`);
