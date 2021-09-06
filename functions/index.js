@@ -172,11 +172,13 @@ app.post(
     if (request.body.newUsername !== request.body.confirmUsername) {
       response.redirect(`/usersettings?message=Usernames does not match!`);
     }
-    await updateAdmin(request.body.id, {
-      username: request.body.newUsername,
-    });
-
-    response.redirect(`/usersettings?message=Username successfully updated.`);
+    else {
+      await updateAdmin(request.body.id, {
+        username: request.body.newUsername,
+      });
+  
+      response.redirect(`/usersettings?message=Username successfully updated.`);
+    }  
   }
 );
 
@@ -187,15 +189,17 @@ app.post(
     if (request.body.newPassword !== request.body.confirmPassword) {
       response.redirect(`/usersettings?message=Passwords does not match!`);
     }
-    const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
-    let encrypted = cipher.update(request.body.newPassword);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    else {
+      const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+      let encrypted = cipher.update(request.body.newPassword);
+      encrypted = Buffer.concat([encrypted, cipher.final()]);
 
-    await updateAdmin(request.body.id, {
-      passwordHash: encrypted.toString("hex").toUpperCase(),
-    });
+      await updateAdmin(request.body.id, {
+        passwordHash: encrypted.toString("hex").toUpperCase(),
+      });
 
     response.redirect(`/usersettings?message=Password successfully updated.`);
+    }
   }
 );
 
