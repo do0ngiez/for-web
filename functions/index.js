@@ -2,13 +2,13 @@ const functions = require("firebase-functions");
 const firebase = require("firebase-admin");
 const express = require("express");
 const session = require("express-session");
-const { FirestoreStore } = require('@google-cloud/connect-firestore');//connection to cloud firestore
+const { FirestoreStore } = require("@google-cloud/connect-firestore"); //connection to cloud firestore
 const engines = require("consolidate");
 const crypto = require("crypto");
 
 const algorithm = "aes-256-cbc"; //cypherblock thing
-const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE"; //random 32 
-const iv = "9ONZu9SfCNbW5ffk";//initialization vector -- still for encryption
+const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE"; //random 32
+const iv = "9ONZu9SfCNbW5ffk"; //initialization vector -- still for encryption
 
 // firebase
 const firebaseConfig = {
@@ -112,10 +112,10 @@ app.use(
     //connection to cloud firestore!
     store: new FirestoreStore({
       dataset: firebaseApp.firestore(),
-      kind: 'express-sessions',
+      kind: "express-sessions",
     }),
-    name: '__session',
-    secret: 'HZRJv39tRqf9tLsgGRjg',//random, encryption for sessions
+    name: "__session",
+    secret: "HZRJv39tRqf9tLsgGRjg", //random, encryption for sessions
     resave: false,
     saveUninitialized: true,
   })
@@ -152,7 +152,7 @@ app.get("/dashboard", checkSignIn, async (request, response) => {
   const users = await getUsers();
   // console.log(users); ---user checker
   let selectedUser = null;
-  if (request.query.id){
+  if (request.query.id) {
     selectedUser = await getUserById(request.query.id);
   }
   response.render("dashboard", {
@@ -181,7 +181,6 @@ app.get("/usersettings", checkSignIn, async (request, response) => {
   });
 });
 
-
 ///ADMINS
 app.post(
   "/updateAdminDetails",
@@ -205,14 +204,13 @@ app.post(
   async function (request, response) {
     if (request.body.newUsername !== request.body.confirmUsername) {
       response.redirect(`/usersettings?message=Usernames does not match!`);
-    }
-    else {
+    } else {
       await updateAdmin(request.body.id, {
         username: request.body.newUsername,
       });
-  
+
       response.redirect(`/usersettings?message=Username successfully updated.`);
-    }  
+    }
   }
 );
 
@@ -222,8 +220,7 @@ app.post(
   async function (request, response) {
     if (request.body.newPassword !== request.body.confirmPassword) {
       response.redirect(`/usersettings?message=Passwords does not match!`);
-    }
-    else {
+    } else {
       //encryption for pass update
       const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
       let encrypted = cipher.update(request.body.newPassword);
@@ -233,30 +230,34 @@ app.post(
         passwordHash: encrypted.toString("hex").toUpperCase(),
       });
 
-    response.redirect(`/usersettings?message=Password successfully updated.`);
+      response.redirect(`/usersettings?message=Password successfully updated.`);
     }
   }
 );
 
 ///USERS
-app.post(
-  "/updateUserDetails",
-  checkSignIn,
-  async function (request, response) {
-    await updateUser(request.body.id, {
-      firstName: request.body.firstName,
-      lastName: request.body.lastName,
-      durationOfContact: request.body.durationOfContact,
-    });
+app.post("/updateUserDetails", checkSignIn, async function (request, response) {
+  await updateUser(request.body.id, {
+    firstName: request.body.firstName,
+    lastName: request.body.lastName,
+    durationOfContact: request.body.durationOfContact,
+  });
 
-    response.redirect(`/dashboard?message=Details successfully updated.`);
-  }
-);
+  response.redirect(`/dashboard?message=Details successfully updated.`);
+});
 
+app.get("/logout", function (request, response) {
+  request.session.destroy();
+  response.redirect("/");
+});
 
-app.post("/login", async function (request, response) {
+// api
+app.post("/api/login", async function (request, response) {
   if (!request.body.username || !request.body.password) {
-    response.redirect(`/?message=Please enter both username and password.`);
+    response.json({
+      success: false,
+      message: "Please enter both username and password.",
+    });
   } else {
     const user = await getAdminByUsername(request.body.username);
     //password encryption
@@ -267,19 +268,19 @@ app.post("/login", async function (request, response) {
       user &&
       user.passwordHash.toUpperCase() ===
         encrypted.toString("hex").toUpperCase()
-        //hexadecimal
+      //hexadecimal
     ) {
       request.session.user = user;
-      response.redirect(`/`);
+      response.json({
+        success: true,
+      });
     } else {
-      response.redirect(`/?message=Invalid credentials! Please contact someone.`);
+      response.json({
+        success: false,
+        message: "Invalid credentials! Please contact someone.",
+      });
     }
   }
-});
-
-app.get("/logout", function (request, response) {
-  request.session.destroy();
-  response.redirect("/");
 });
 
 exports.app = functions.https.onRequest(app);

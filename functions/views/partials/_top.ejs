@@ -22,9 +22,9 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <% if (currentUser) { %>
-                <li class="nav-item">
-                    <a class="nav-link <%= pageName === '' && 'active' %>" href="/">Index</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= pageName === '' && 'active' %>" href="/">Index</a>
+                    </li>
                 <li class="nav-item">
                     <a class="nav-link <%= pageName === 'dashboard' && 'active' %>" href="/dashboard">Dashboard</a>
                 </li>
@@ -78,7 +78,11 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="/login" method="POST">
+                    <div id="loginAlert" class="alert alert-danger d-none" role="alert">
+                        This is a danger alert—check it out!
+                    </div>
+
+                    <form id="loginForm">
                         <div class="form-group">
                             <label for="username">Username</label>
                             <input type="text" class="form-control" name="username" id="adminUsername"
@@ -106,4 +110,36 @@
             </div>
         </div>
     </div>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            (function ($) {
+                $("#loginForm").on("submit", async function (event) {
+                    event.preventDefault();
+
+                    const username = $('#adminUsername').val();
+                    const password = $('#adminPassword').val();
+
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username,
+                            password
+                        })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        location.href = '/';
+                    }
+                    else {
+                        $('#loginAlert').removeClass('d-none').text(data.message);
+                    }
+                });
+            })(jQuery);
+        });
+      </script>
     <% } %>
