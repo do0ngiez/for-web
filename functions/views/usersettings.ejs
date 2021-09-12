@@ -171,7 +171,11 @@
       role="tabpanel"
       aria-labelledby="username-tab"
     >
-      <form action="/updateAdminUsername" method="POST">
+      <div id="usernameAlert" class="alert alert-danger d-none" role="alert">
+        This is a danger alert—check it out!
+      </div>
+
+      <form id="usernameForm" action="/updateAdminUsername" method="POST">
         <input type="text" hidden name="id" value="<%= selectedAdmin.id %>" />
 
         <div class="row">
@@ -227,7 +231,11 @@
       role="tabpanel"
       aria-labelledby="password-tab"
     >
-      <form action="/updateAdminPassword" method="POST">
+      <div id="passwordAlert" class="alert alert-danger d-none" role="alert">
+        This is a danger alert—check it out!
+      </div>
+
+      <form id="passwordForm" action="/updateAdminPassword" method="POST">
         <input type="text" hidden name="id" value="<%= selectedAdmin.id %>" />
 
         <div class="row">
@@ -278,6 +286,49 @@
       $("#myTable tbody").on("click", "tr", function () {
         const data = table.row(this).data();
         window.location = `/usersettings?id=${data[0]}`;
+      });
+
+      $("#usernameForm").on("submit", async function (event) {
+        event.preventDefault();
+
+        const newUsername = $("#newUsername").val();
+        const confirmUserName = $("#confirmUsername").val();
+
+        if (!newUsername) {
+          $("#usernameAlert")
+            .removeClass("d-none")
+            .text("Username cannot be empty.");
+        } else if (newUsername !== confirmUserName) {
+          $("#usernameAlert")
+            .removeClass("d-none")
+            .text("Usernames did not match.");
+        } else {
+          $(this).unbind();
+          $(this).submit();
+        }
+      });
+
+      $("#passwordForm").on("submit", async function (event) {
+        event.preventDefault();
+
+        const newPassword = $("#newPassword").val();
+        const confirmPassword = $("#confirmPassword").val();
+
+        if (!newPassword) {
+          $("#passwordAlert")
+            .removeClass("d-none")
+            .text("Password cannot be empty.");
+        } else if (newPassword !== confirmPassword) {
+          $("#passwordAlert")
+            .removeClass("d-none")
+            .text("Passwords did not match.");
+        } else {
+          $(this).unbind();
+          $(this).submit();
+        }
+
+        $("#newPassword").val("");
+        $("#confirmPassword").val("");
       });
     })(jQuery);
   });
