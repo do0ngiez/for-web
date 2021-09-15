@@ -241,6 +241,7 @@ app.post("/updateUserDetails", checkSignIn, async function (request, response) {
     firstName: request.body.firstName,
     lastName: request.body.lastName,
     durationOfContact: request.body.durationOfContact,
+    status: request.body.status
   });
 
   response.redirect(`/dashboard?message=Details successfully updated.`);

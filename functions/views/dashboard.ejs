@@ -21,8 +21,8 @@
       <tr>
         <th class="d-none">Id</th>
         <th scope="col">Full Name</th>
-        <th scope="col">Duration</th>
         <th scope="col">Time of Contact</th>
+        <th scope="col">Status</th>
       </tr>
     </thead>
     <tbody>
@@ -30,8 +30,8 @@
       <tr>
         <td class="d-none"><%= user.id %></td>
         <td><%= user.firstName %> <%= user.lastName %></td>
-        <td><%= user.durationOfContact %></td>
         <td><%= new Date(user.timeOfContact._seconds) %></td>
+        <td><%= user.status %></td>
       </tr>
       <% }) %>
     </tbody>
@@ -102,6 +102,7 @@
                 id="firstName"
                 name="firstName"
                 value="<%= selectedUser.firstName %>"
+                required
               />
             </div>
           </div>
@@ -114,6 +115,7 @@
                 id="lastName" 
                 name="lastName"
                 value="<%= selectedUser.lastName %>"
+                required
               />
             </div>
           </div>
@@ -122,23 +124,41 @@
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
-              <label for="Duration"> Duration </label>
+              <label for="Duration"> Duration (sec) </label>
               <input
-                type="text"
+                type="number"
                 class="form-control"
                 id="duration"
                 name="durationOfContact" <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %> 
                 value="<%= selectedUser.durationOfContact %>"
+                required
               />
             </div>
           </div>
-
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="Status"> Status </label>
+              <select class="form-control" name="status" id="status" required>
+                <option></option>
+                <option value="Positive">Positive</option>
+                <option value="Negative">Negative</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <input type="submit" class="btn bg-adduOrange" value="   Save   " />
       </form>
     </div>
-    <% } %>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        (function ($) {
+          $('#status').val("<%= selectedUser.status %>").change();
+        })(jQuery);
+      });
+    </script>
+  <% } %>
   </div>
 </div>
 

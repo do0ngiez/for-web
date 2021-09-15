@@ -20,27 +20,37 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mx-auto">
                 <% if (currentUser) { %>
-                    <li class="nav-item">
-                        <a class="nav-link <%= pageName === '' && 'active' %>" href="/">Index</a>
+                    <li class="nav-item mx-5">
+                        <a 
+                        class="nav-link <%= pageName === '' && 'active' %>" href="/">
+                        <img src="/open-iconic/svg/info.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 13px; margin-bottom: 4px;">
+                        Index
+                        </a>
                     </li>
-                <li class="nav-item">
-                    <a class="nav-link <%= pageName === 'dashboard' && 'active' %>" href="/dashboard">Dashboard</a>
+                <li class="nav-item mx-5">
+                    <a 
+                    class="nav-link <%= pageName === 'dashboard' && 'active' %>" href="/dashboard">
+                    <img src="/open-iconic/svg/pin.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 12px; margin-bottom: 3px;">
+                    Dashboard
+                </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link <%= pageName === 'archived' && 'active' %>" href="/archived">Archive</a>
+                <li class="nav-item mx-5">
+                    <a 
+                    class="nav-link <%= pageName === 'archived' && 'active' %>" href="/archived">
+                    <img src="/open-iconic/svg/folder.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 12px; margin-bottom: 4px;">
+                    Archive
+                </a>
                 </li>
+                <!-- If not logged in! -->
                 <% } else { %>
-                <li class="nav-item">
+                <li class="nav-item mx-5">
                     <a class="nav-link <%= pageName === '' && 'active' %>" href="/">Index</a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link <%= pageName === 'about' && 'active' %>" href="/about">About</a>
-                </li> -->
                 <% } %>
             </ul>
-            <!-- LOGIN!! -->
+            <!-- LOGIN!!!! -->
             <% if (!currentUser) { %>
             <button type="button" class="btn btn-outline-light my-2 my-sm-0" style="width: 120px;" data-toggle="modal"
                 data-target="#loginModal">
@@ -53,14 +63,33 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="color-adduOrange"><%= currentUser.firstName %> <%= currentUser.lastName %></span> <!-- concat name!! :) -->
+                        <img src="/open-iconic/svg/person.svg" alt="person icon" style="filter: invert(1); width: auto; height: 11px; margin-bottom: 3px;">
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                         <a class="dropdown-item"href="/usersettings">User Settings</a>
+                         <a 
+                         class="dropdown-item"href="/usersettings">User Settings
+                        </a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/logout">Logout</a>
+                        <a 
+                        class="dropdown-item" href="/logout" onclick="return confirmLogout()">Logout 
+                        <img src="/open-iconic/svg/account-logout.svg" alt="account logout icon" style="width: auto; height: 11px; margin-bottom: 2px;">
+                        </a>
                     </div>
                 </li>
              </ul>
+
+             <script type="text/javascript">
+                function confirmLogout()
+                {
+                    if (confirm("Are you sure you want to log out?")) {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            </script>
             <% } %>
         </div>
     </nav>
@@ -111,7 +140,7 @@
         </div>
     </div>
 
-    <script>
+    <script type="text/javascript">
         window.addEventListener("DOMContentLoaded", function () {
             (function ($) {
                 $("#loginForm").on("submit", async function (event) {
