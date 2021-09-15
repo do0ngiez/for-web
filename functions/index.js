@@ -66,10 +66,14 @@ async function updateAdmin(id, data) {
 }
 
 // USERS AREA
-async function getUsers() {
+async function getUsers(statusFilter) {
   let data = [];
   const ref = firebaseApp.firestore().collection("users");
-  await ref.get().then((snap) =>
+  let query = ref;
+  if (statusFilter) {
+    query = ref.where("status", "==", statusFilter);
+  }
+  await query.get().then((snap) =>
     snap.forEach((doc) => {
       const entry = doc.data();
       entry.id = doc.id;
@@ -149,7 +153,7 @@ app.get("/archived", checkSignIn, (request, response) => {
 });
 
 app.get("/dashboard", checkSignIn, async (request, response) => {
-  const users = await getUsers();
+  const users = await getUsers(request.query.statusFilter);
   // console.log(users); ---user checker
   let selectedUser = null;
   if (request.query.id) {
@@ -241,7 +245,7 @@ app.post("/updateUserDetails", checkSignIn, async function (request, response) {
     firstName: request.body.firstName,
     lastName: request.body.lastName,
     durationOfContact: request.body.durationOfContact,
-    status: request.body.status
+    status: request.body.status,
   });
 
   response.redirect(`/dashboard?message=Details successfully updated.`);

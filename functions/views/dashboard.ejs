@@ -16,6 +16,12 @@
     Change or update the user details.
   </p>
 
+  <select class="form-control" name="status" id="statusFilter">
+    <option></option>
+    <option value="Positive">Positive</option>
+    <option value="Negative">Negative</option>
+  </select>
+  <button class="btn btn-primary" id="filterButton">Filter</button>
   <table id="myTable" class="table table-hover table-bordered">
     <thead class="bg-addu">
       <tr>
@@ -203,6 +209,11 @@
       $("#myTable tbody").on("click", "tr", function () {
         const data = table.row(this).data();
         window.location = `/dashboard?id=${data[0]}`;
+      });
+
+      $('#filterButton').on('click', function() {
+        const statusFilter = $('#statusFilter').val();
+        window.location = `/dashboard?statusFilter=${statusFilter}`;
       });
     })(jQuery);
   });
