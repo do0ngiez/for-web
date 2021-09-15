@@ -66,12 +66,20 @@ async function updateAdmin(id, data) {
 }
 
 // USERS AREA
-async function getUsers(statusFilter) {
+async function getUsers(statusFilter, fromDateFilter, toDateFilter) {
   let data = [];
   const ref = firebaseApp.firestore().collection("users");
   let query = ref;
   if (statusFilter) {
     query = ref.where("status", "==", statusFilter);
+  }
+  if (fromDateFilter && toDateFilter) {
+    const toDate = new Date(toDateFilter);
+    toDate.setDate(toDate.getDate() + 1);
+    toDate.setMilliseconds(toDate.getMilliseconds() - 1);
+    query = ref
+      .where("timeOfContact", ">=", new Date(fromDateFilter))
+      .where("timeOfContact", "<=", toDate);
   }
   await query.get().then((snap) =>
     snap.forEach((doc) => {
@@ -153,7 +161,11 @@ app.get("/archived", checkSignIn, (request, response) => {
 });
 
 app.get("/dashboard", checkSignIn, async (request, response) => {
-  const users = await getUsers(request.query.statusFilter);
+  const users = await getUsers(
+    request.query.statusFilter,
+    request.query.fromDateFilter,
+    request.query.toDateFilter
+  );
   // console.log(users); ---user checker
   let selectedUser = null;
   if (request.query.id) {
