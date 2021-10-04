@@ -104,6 +104,19 @@ async function getUserById(id) {
   return data;
 }
 
+async function getUserByUsername(username) {
+  let data = null;
+  const ref = firebaseApp.firestore().collection("users");
+  const snapshot = await ref.where("username", "==", username).get();
+  if (snapshot) {
+    snapshot.forEach((doc) => {
+      data = doc.data();
+      data.id = doc.id;
+    });
+  }
+  return data;
+}
+
 async function updateUser(id, data) {
   const ref = firebaseApp.firestore().collection("users");
   await ref.doc(id).update(data);
@@ -133,8 +146,17 @@ app.use(
   })
 );
 
-function checkSignIn(req, res, next) {
-  if (req.session.user) {
+function checkIsUser(req, res, next) {
+  if (req.session.user && !req.session.isAdmin) {
+    next(); //If session exists, proceed to page
+  } else {
+    const err = new Error("Not logged in!");
+    next(err); //Error, trying to access unauthorized page!
+  }
+}
+
+function checkIsAdmin(req, res, next) {
+  if (req.session.isAdmin) {
     next(); //If session exists, proceed to page
   } else {
     const err = new Error("Not logged in!");
@@ -148,19 +170,31 @@ app.get("/", (request, response) => {
     title: "BlueDu",
     pageName: "",
     currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
     message: request.query.message,
   });
 });
 
-app.get("/archived", checkSignIn, (request, response) => {
+app.get("/profile", checkIsUser, (request, response) => {
+  response.render("profile", {
+    title: "Profile",
+    pageName: "profile",
+    currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
+    message: request.query.message,
+  });
+});
+
+app.get("/archived", checkIsAdmin, (request, response) => {
   response.render("archived", {
     title: "Archived Data",
     pageName: "archived",
     currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
   });
 });
 
-app.get("/dashboard", checkSignIn, async (request, response) => {
+app.get("/dashboard", checkIsAdmin, async (request, response) => {
   const users = await getUsers(
     request.query.statusFilter,
     request.query.fromDateFilter,
@@ -175,13 +209,14 @@ app.get("/dashboard", checkSignIn, async (request, response) => {
     title: "Dashboard",
     pageName: "dashboard",
     currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
     users,
     selectedUser,
     message: request.query.message,
   });
 });
 
-app.get("/usersettings", checkSignIn, async (request, response) => {
+app.get("/usersettings", checkIsAdmin, async (request, response) => {
   const admins = await getAdmins();
   let selectedAdmin = null;
   if (request.query.id) {
@@ -191,6 +226,7 @@ app.get("/usersettings", checkSignIn, async (request, response) => {
     title: "Settings",
     pageName: "usersettings",
     currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
     admins,
     selectedAdmin,
     message: request.query.message,
@@ -200,7 +236,7 @@ app.get("/usersettings", checkSignIn, async (request, response) => {
 ///ADMINS
 app.post(
   "/updateAdminDetails",
-  checkSignIn,
+  checkIsAdmin,
   async function (request, response) {
     await updateAdmin(request.body.id, {
       firstName: request.body.firstName,
@@ -216,7 +252,7 @@ app.post(
 
 app.post(
   "/updateAdminUsername",
-  checkSignIn,
+  checkIsAdmin,
   async function (request, response) {
     if (request.body.newUsername !== request.body.confirmUsername) {
       response.redirect(`/usersettings?message=Usernames does not match!`);
@@ -232,7 +268,7 @@ app.post(
 
 app.post(
   "/updateAdminPassword",
-  checkSignIn,
+  checkIsAdmin,
   async function (request, response) {
     if (request.body.newPassword !== request.body.confirmPassword) {
       response.redirect(`/usersettings?message=Passwords does not match!`);
@@ -252,24 +288,81 @@ app.post(
 );
 
 ///USERS
-app.post("/updateUserDetails", checkSignIn, async function (request, response) {
-  await updateUser(request.body.id, {
+app.post("/profile", checkIsUser, async function (request, response) {
+  await updateUser(request.session.user.id, {
     firstName: request.body.firstName,
     lastName: request.body.lastName,
-    durationOfContact: request.body.durationOfContact,
-    status: request.body.status,
   });
 
-  response.redirect(`/dashboard?message=Details successfully updated.`);
+  request.session.user.firstName = request.body.firstName;
+  request.session.user.lastName = request.body.lastName;
+
+  response.redirect(`/profile?message=Profile successfully updated.`);
+});
+
+app.post(
+  "/updateUserDetails",
+  checkIsAdmin,
+  async function (request, response) {
+    await updateUser(request.body.id, {
+      firstName: request.body.firstName,
+      lastName: request.body.lastName,
+      durationOfContact: request.body.durationOfContact,
+      status: request.body.status,
+    });
+
+    response.redirect(`/dashboard?message=Details successfully updated.`);
+  }
+);
+
+app.get("/admin-login", (request, response) => {
+  response.render("admin-login", {
+    title: "Admin Login",
+    pageName: "admin-login",
+    currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
+    message: request.query.message,
+  });
 });
 
 app.get("/logout", function (request, response) {
-  request.session.destroy();
-  response.redirect("/");
+  request.session.destroy(() => response.redirect("/"));
 });
 
 // api
 app.post("/api/login", async function (request, response) {
+  if (!request.body.username || !request.body.password) {
+    response.json({
+      success: false,
+      message: "Please enter both username and password.",
+    });
+  } else {
+    const user = await getUserByUsername(request.body.username);
+    //password encryption
+    const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+    let encrypted = cipher.update(request.body.password);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    if (
+      user &&
+      user.passwordHash.toUpperCase() ===
+        encrypted.toString("hex").toUpperCase()
+      //hexadecimal
+    ) {
+      request.session.user = user;
+      request.session.isAdmin = false;
+      response.json({
+        success: true,
+      });
+    } else {
+      response.json({
+        success: false,
+        message: "Invalid credentials! Please contact someone.",
+      });
+    }
+  }
+});
+
+app.post("/api/admin-login", async function (request, response) {
   if (!request.body.username || !request.body.password) {
     response.json({
       success: false,
@@ -288,6 +381,7 @@ app.post("/api/login", async function (request, response) {
       //hexadecimal
     ) {
       request.session.user = user;
+      request.session.isAdmin = true;
       response.json({
         success: true,
       });

@@ -21,14 +21,20 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mx-auto">
-                <% if (currentUser) { %>
-                    <li class="nav-item mx-5">
-                        <a 
-                        class="nav-link <%= pageName === '' && 'active' %>" href="/">
-                        <img src="/open-iconic/svg/info.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 13px; margin-bottom: 4px;">
-                        Index
-                        </a>
-                    </li>
+                <% if (isAdmin) { %>
+                <li class="nav-item mx-5">
+                    <a 
+                        class="nav-link" href="#">
+                        ADMIN MODE
+                    </a>
+                </li>
+                <li class="nav-item mx-5">
+                    <a 
+                    class="nav-link <%= pageName === '' && 'active' %>" href="/">
+                    <img src="/open-iconic/svg/info.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 13px; margin-bottom: 4px;">
+                    Index
+                    </a>
+                </li>
                 <li class="nav-item mx-5">
                     <a 
                     class="nav-link <%= pageName === 'dashboard' && 'active' %>" href="/dashboard">
@@ -43,10 +49,29 @@
                     Archive
                 </a>
                 </li>
+                <% } else if (currentUser) { %>
+                <li class="nav-item mx-5">
+                    <a 
+                        class="nav-link <%= pageName === '' && 'active' %>" href="/">
+                        <img src="/open-iconic/svg/info.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 13px; margin-bottom: 4px;">
+                        Index
+                    </a>
+                </li>
+                <li class="nav-item mx-5">
+                    <a 
+                        class="nav-link <%= pageName === 'profile' && 'active' %>" href="/profile">
+                        <img src="/open-iconic/svg/pin.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 12px; margin-bottom: 3px;">
+                        Profile
+                    </a>
+                </li>
                 <!-- If not logged in! -->
                 <% } else { %>
                 <li class="nav-item mx-5">
-                    <a class="nav-link <%= pageName === '' && 'active' %>" href="/">Index</a>
+                    <a 
+                    class="nav-link <%= pageName === '' && 'active' %>" href="/">
+                    <img src="/open-iconic/svg/info.svg" alt="person icon" style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 13px; margin-bottom: 4px;">
+                    Index
+                    </a>
                 </li>
                 <% } %>
             </ul>
@@ -66,13 +91,14 @@
                         <img src="/open-iconic/svg/person.svg" alt="person icon" style="filter: invert(1); width: auto; height: 11px; margin-bottom: 3px;">
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                         <a 
-                         class="dropdown-item"href="/usersettings">User Settings
-                        </a>
-                        <div class="dropdown-divider"></div>
+                        <% if (isAdmin) { %>
+                            <a class="dropdown-item"href="/usersettings">User Settings</a>
+                            <div class="dropdown-divider"></div>
+                        <% } %>
                         <a 
-                        class="dropdown-item" href="/logout" onclick="return confirmLogout()">Logout 
-                        <img src="/open-iconic/svg/account-logout.svg" alt="account logout icon" style="width: auto; height: 11px; margin-bottom: 2px;">
+                            class="dropdown-item" href="/logout" onclick="return confirmLogout()">
+                            Logout 
+                            <img src="/open-iconic/svg/account-logout.svg" alt="account logout icon" style="width: auto; height: 11px; margin-bottom: 2px;">
                         </a>
                     </div>
                 </li>
@@ -101,7 +127,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-addu">
-                    <h5 class="modal-title" id="loginModalLabel">Admin Login</h5>
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true" style="color: white;">&times;</span>
                     </button>
@@ -114,7 +140,7 @@
                     <form id="loginForm">
                         <div class="form-group">
                             <label for="username">Username</label>
-                            <input type="text" class="form-control" name="username" id="adminUsername"
+                            <input type="text" class="form-control" name="username" id="username"
                                 aria-describedby="usernameHelp" placeholder="Enter username">
                             <small id="usernameHelp" class="form-text text-muted">We'll never share your username with
                                 anyone
@@ -122,7 +148,7 @@
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="password" class="form-control" name="password" id="adminPassword"
+                            <input type="password" class="form-control" name="password" id="password"
                                 placeholder="Password">
                         </div>
                         <div class="form-group" style="text-align: center;">
@@ -146,8 +172,8 @@
                 $("#loginForm").on("submit", async function (event) {
                     event.preventDefault();
 
-                    const username = $('#adminUsername').val();
-                    const password = $('#adminPassword').val();
+                    const username = $('#username').val();
+                    const password = $('#password').val();
 
                     const response = await fetch('/api/login', {
                         method: 'POST',

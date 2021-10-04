@@ -1,0 +1,63 @@
+<%- include('./partials/_top') %>
+
+<div class="container">
+    <br />
+
+    <div id="adminLoginAlert" class="alert alert-danger d-none" role="alert">
+        This is a danger alert—check it out!
+    </div>
+
+    <form id="adminLoginForm">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" name="username" id="adminUsername"
+                aria-describedby="usernameHelp" placeholder="Enter username">
+            <small id="usernameHelp" class="form-text text-muted">We'll never share your username with
+                anyone
+                else.</small>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" name="password" id="adminPassword"
+                placeholder="Password">
+        </div>
+        <div class="form-group" style="text-align: center;">
+            <input type="submit" class="btn btn-primary bg-addu" style="width: 125px;" value="Login">
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    window.addEventListener("DOMContentLoaded", function () {
+        (function ($) {
+            $("#adminLoginForm").on("submit", async function (event) {
+                event.preventDefault();
+                console.log('hi')
+
+                const username = $('#adminUsername').val();
+                const password = $('#adminPassword').val();
+
+                const response = await fetch('/api/admin-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        password
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    location.href = '/';
+                }
+                else {
+                    $('#adminLoginAlert').removeClass('d-none').text(data.message);
+                }
+            });
+        })(jQuery);
+    });
+  </script>
+
+<%- include('./partials/_bottom') %>
