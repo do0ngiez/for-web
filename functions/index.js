@@ -165,15 +165,38 @@ function checkIsAdmin(req, res, next) {
 }
 
 // PAGES AREA
-app.get("/", (request, response) => {
-  response.render("index", {
-    title: "BlueDu",
-    pageName: "",
-    currentUser: request.session.user,
-    isAdmin: request.session.isAdmin,
-    message: request.query.message,
-  });
+app.get("/", (request, response) => { //gets the index after logging in
+  if (request.session.user)
+  {
+    response.render("index", {
+      title: "BlueDu",
+      pageName: "",
+      currentUser: request.session.user,
+      isAdmin: request.session.isAdmin,
+      message: request.query.message,
+    });
+  }
+  else
+  {
+    response.render("login", {
+      title: "Login",
+      pageName: "login",
+      currentUser: request.session.user,
+      isAdmin: request.session.isAdmin,
+      message: request.query.message,
+    });
+  }
 });
+
+// app.get("/login", (request, response) => {
+//   response.render("login", {
+//     title: "Login",
+//     pageName: "login",
+//     currentUser: request.session.user,
+//     isAdmin: request.session.isAdmin,
+//     message: request.query.message,
+//   });
+// });
 
 app.get("/profile", checkIsUser, (request, response) => {
   response.render("profile", {
@@ -315,10 +338,10 @@ app.post(
   }
 );
 
-app.get("/admin-login", (request, response) => {
-  response.render("admin-login", {
+app.get("/login-admin", (request, response) => { //gets to show the login-admin page
+  response.render("login-admin", {
     title: "Admin Login",
-    pageName: "admin-login",
+    pageName: "login-admin",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     message: request.query.message,
@@ -362,7 +385,7 @@ app.post("/api/login", async function (request, response) {
   }
 });
 
-app.post("/api/admin-login", async function (request, response) {
+app.post("/api/login-admin", async function (request, response) {
   if (!request.body.username || !request.body.password) {
     response.json({
       success: false,

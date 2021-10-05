@@ -1,0 +1,115 @@
+<%- include('./partials/_top_no_nav.ejs') %>
+
+    <!-- <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Left Side</h2>
+            </div>
+            <div class="col-md-6">
+                <h2>Login Form</h2>
+            </div>
+        </div>
+
+    </div> -->
+
+    <div class="container-fluid">
+        <div class="row no-gutter">
+            <!-- The image half -->
+            <div class="col-md-6 d-flex d-none bg-image"></div>
+
+
+            <!-- The content half -->
+            <div class="col-md-6 bg-light">
+                <div class="login d-flex align-items-center py-5">
+
+                    <!-- Demo content-->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-10 col-xl-7 mx-auto">
+                                <h3 class="display-4">Welcome!</h3>
+                                <p class="text-muted mb-4">For Ateneo de Davao University Clinic's BlueDu
+                                    Form</p>
+
+                                <div id="adminLoginAlert" class="alert alert-danger d-none" role="alert">
+                                    This is a danger alert—check it out!
+                                </div>
+
+                                <form id="userLoginForm">
+                                    <div class="form-group mb-3">
+                                        <input id="userUsername" type="text" placeholder="Username" required=""
+                                            autofocus="" class="form-control rounded-pill border-0 shadow-sm px-4">
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <input id="userPassword" type="password" placeholder="Password" required=""
+                                            class="form-control rounded-pill border-0 shadow-sm px-4 text-primary">
+                                    </div>
+                                    <div class="custom-control custom-checkbox mb-3">
+                                        <input id="rememberUsername" type="checkbox" checked
+                                            class="custom-control-input">
+                                        <label for="rememberUsername" class="custom-control-label">Remember
+                                            username</label>
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary btn-block text-uppercase mb-2 rounded-pill shadow-sm">Sign
+                                        in</button>
+                                    <div class="text-center d-flex justify-content-between mt-4">
+                                        <!-- <p>Snippet by <a href="https://bootstrapious.com/snippets"
+                                                class="font-italic text-muted">
+                                                <u>Boostrapious</u></a></p> -->
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div><!-- End -->
+
+                </div>
+            </div><!-- End -->
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window.addEventListener("DOMContentLoaded", function () {
+            (function ($) {
+                $("#userLoginForm").on("submit", async function (event) {
+                    event.preventDefault();
+
+                    const username = $('#userUsername').val();
+                    const password = $('#userPassword').val();
+                    const remember = $('#rememberUsername').val();
+
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username,
+                            password,
+                            remember
+                        })
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        if (remember) {
+                            document.cookie = `username=${username}`;
+                        }
+                        location.href = '/';
+                    }
+                    // else {
+                    //     $('#adminLoginAlert').removeClass('d-none').text(data.message);
+                    // }
+                });
+
+                const cookieUsername = document.cookie
+                    .split(';')
+                    .find(row => row.startsWith('username='))
+                    ?.split('=')[1];
+
+                $('#userUsername').val(cookieUsername);
+            })(jQuery);
+        });
+    </script>
+
+    <%- include('./partials/_bottom') %>

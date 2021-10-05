@@ -109,3 +109,14 @@ input.bg-addu:focus {
 .feed {
   width: 100%;
 }
+
+.login,
+.image {
+  min-height: 100vh;
+}
+
+.bg-image {
+  background-image: url('/images/AdDUPool.jpg');
+  background-size: cover;
+  background-position: center center;
+}
