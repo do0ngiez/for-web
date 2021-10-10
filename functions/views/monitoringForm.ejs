@@ -1,0 +1,28 @@
+<%- include('./partials/_top') %>
+
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+    integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <div class="container mt-3">
+    <a href="/">
+        <a href="/">
+            <img src="/open-iconic/svg/chevron-left.svg" alt="left arrow icon" style="width: auto; height: 20px;">
+            Back to Home</a>
+
+        <% if (message) { %>
+        <h4>
+            <%= message %>
+        </h4>
+        <% } %>
+
+        <h1 class="mt-4">
+            MONITORING FORM
+        </h1>
+        <p class="color-adduOrange">
+            Daily self-monitoring form for quarantine.
+        </p>
+  </div>
+
+  <%- include('./partials/_bottom') %>

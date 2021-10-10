@@ -1,0 +1,368 @@
+<%- include('./partials/_top') %>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+    integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <div class="container mt-3">
+    <a href="/">
+      <img src="/open-iconic/svg/chevron-left.svg" alt="left arrow icon" style="width: auto; height: 20px;">
+      Back to Home</a>
+
+        <% if (message) { %>
+        <h4>
+          <%= message %>
+        </h4>
+        <% } %>
+
+        <h1 class="mt-4">
+            CONTACT TRACING FORM
+        </h1>
+        <p class="color-adduOrange">
+            Contact tracing of patient and contacts & activities done list.   
+        </p>
+  </div>
+
+  <!-- USER DETAILS -->
+  <div class="container">
+    <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+      <h4>User Details</h4>
+    </div>
+    <div class="container border pt-3 pl-4 pr-4 pb-4">
+      <div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="firstName"> First Name </label>
+              <input type="text" class="form-control" id="firstName" name="firstName"
+                value="<%= currentUser.firstName %>" readonly />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="lastName"> Last Name </label>
+              <input type="text" class="form-control" id="lastName" name="lastName"
+                value="<%= currentUser.lastName %>" readonly />
+            </div>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="address"> Address </label>
+              <input type="text" class="form-control" id="address" name="address"
+              value="<%= currentUser.address %>" readonly
+                />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="phoneNumber"> Phone Number </label>
+              <input type="number" class="form-control" id="phoneNumber" name="phoneNumber"
+              value="<%= currentUser.phoneNumber %>" readonly
+                />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHO LIVES WITH YOU PORTION -->
+  <form action="/contactTracingForm" method="POST">
+
+    <div class="container">
+      <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+          <h4>Who lives with you?</h4>
+      </div>
+      <div id="livesWithContainer" class="container border pt-3 pl-4 pr-4 pb-4">
+        <div id="livesWithForm">
+          <div>
+            <div class="row">
+              <div class="col-md-4">
+                  <label for="livesWith[0][firstName]">First Name</label>
+                  <input type="text" class="form-control" id="livesWith[0][firstName]" name="livesWith[0][firstName]" value="" required>
+              </div>
+              <div class="col-md-4">
+                <label for="livesWith[0][lastName]">Last Name</label>
+                <input type="text" class="form-control" id="livesWith[0][lastName]" name="livesWith[0][lastName]" value="" required>
+              </div>
+              <div class="col-md-3">
+                  <label for="livesWith[0][phoneNumber]">Phone Number</label>
+                  <input type="number" class="form-control" id="livesWith[0][phoneNumber]" name="livesWith[0][phoneNumber]" value="" required>
+              </div>
+              <div class="col-md-1">
+                  <button class="btn btn-danger livesWithRemoveButton" type="button" style="margin-top: 2rem; height: 2.25rem; width: 3.5rem;">
+                      <img src="/open-iconic/svg/trash.svg" alt="trash icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+                  </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary-addu mt-3" type="button" id="livesWithAddButton" style="border-radius: 200px; width:40px; height: 40px;">
+          <img src="/open-iconic/svg/plus.svg" alt="add icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+          <h4>Who have you been around (within 6 feet for more than 15 minutes) in the last 10 days?</h4>
+      </div>
+      <div id="beenAroundContainer" class="container border pt-3 pl-4 pr-4 pb-4">
+        <div id="beenAroundForm">
+          <div>
+            <div class="row">
+              <div class="col-md-6">
+                  <label for="beenAround[0][firstName]">First Name</label>
+                  <input type="text" class="form-control" id="beenAround[0][firstName]" name="beenAround[0][firstName]" value="" required>
+              </div>
+              <div class="col-md-5">
+                <label for="beenAround[0][lastName]">Last Name</label>
+                <input type="text" class="form-control" id="beenAround[0][lastName]" name="beenAround[0][lastName]" value="">
+              </div>
+              <div class="col-md-1">
+                <button class="btn btn-danger beenAroundRemoveButton" type="button" style="margin-top: 2rem; height: 2.25rem; width: 3.5rem;">
+                    <img src="/open-iconic/svg/trash.svg" alt="trash icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label for="beenAround[0][dateLastSaw]">Date you last saw them</label>
+                <input type="text" class="form-control datepicker" id="beenAround[0][dateLastSaw]" name="beenAround[0][dateLastSaw]" value="" required>
+              </div>
+              <div class="col-md-6">
+                <label for="beenAround[0][whereLastSaw]">Where you last saw them</label>
+                <input type="text" class="form-control" id="beenAround[0][whereLastSaw]" name="beenAround[0][whereLastSaw]" value="" required>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary-addu mt-3" type="button" id="beenAroundAddButton" style="border-radius: 200px; width:40px; height: 40px;">
+          <img src="/open-iconic/svg/plus.svg" alt="add icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+          <h4>What have you done in the last 10 days with other people? </h4>
+      </div>
+      <div id="activityContainer" class="container border pt-3 pl-4 pr-4 pb-4">
+        <div id="activityForm">
+          <div>
+            <div class="row">
+              <div class="col-md-9">
+                  <label for="activity[0][activity]">Activity</label>
+                  <input type="text" class="form-control" id="activity[0][activity]" name="activity[0][activity]" value="" required>
+              </div>
+              <div class="col-md-2">
+                <label for="activity[0][date]">Date</label>
+                <input type="text" class="form-control datepicker" id="activity[0][date]" name="activity[0][date]" value="" required>
+              </div>
+              <div class="col-md-1">
+                <button class="btn btn-danger activityRemoveButton" type="button" style="margin-top: 2rem; height: 2.25rem; width: 3.5rem;">
+                    <img src="/open-iconic/svg/trash.svg" alt="trash icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label for="activity[0][location]">Location</label>
+                <input type="text" class="form-control" id="activity[0][location]" name="activity[0][location]" value="" required>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary-addu mt-3" type="button" id="activityAddButton" style="border-radius: 200px; width:40px; height: 40px;">
+          <img src="/open-iconic/svg/plus.svg" alt="add icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="container">
+        <div class="row border-bottom border-left border-right p-2" style="background-color: #e6e6e6;">
+          <div class="col-sm-6">
+            <h3 class="color-adduOrange"><b>Things to think about:</b></h3>
+            <p>
+                <ul>
+                    <li>Gone to work or school?</li>
+                    <li>Met with others (e.g. eaten out at a restaurant, gone out for drinks, exercised to a gym, had friends in your house, volunteered, strolling in your village/subdivision, park)</li>
+                <ul>
+            </p>
+          </div>
+          <div class="col-sm-6">
+            <div class="mt-5">
+              <p>
+                <ul>
+                    <li>Gone to a store in person (eg. grocery store, mall)</li>
+                    <li>Gone in-person appointments (e.g. salon, barber, doctor’s/dentist’s office)</li>
+                    <li>Ridden in a car with others (e.g. Taxi) or took public transportation?</li>
+                <ul>
+            </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-2">
+      <input type="submit" style="width: 10rem;" class="btn btn-orange-addu" value="Submit">
+    </div>
+  </form>
+  
+<!-- SCRIPTS -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+    integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", function () {
+      (function ($) {
+        function initializeDatepicker()
+        {
+          $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            startDate: '-10d',
+            endDate: '0d'
+          });
+        };
+
+        $('#livesWithAddButton').on('click', function() {
+          const count = $('#livesWithForm > div').length;
+          const html = `
+          <div class="mt-2 border-top">
+            <div class="row">
+              <div class="col-md-4">
+                  <label for="livesWith[${count}][firstName]">First Name</label>
+                  <input type="text" class="form-control" id="livesWith[${count}][firstName]" name="livesWith[${count}][firstName]" value="" required>
+              </div>
+              <div class="col-md-4">
+                <label for="livesWith[${count}][lastName]">Last Name</label>
+                <input type="text" class="form-control" id="livesWith[${count}][lastName]" name="livesWith[${count}][lastName]" value="" required>
+              </div>
+              <div class="col-md-3">
+                  <label for="livesWith[${count}][phoneNumber]">Phone Number</label>
+                  <input type="number" class="form-control" id="livesWith[${count}][phoneNumber]" name="livesWith[${count}][phoneNumber]" value="" required>
+              </div>
+              <div class="col-md-1">
+                  <button class="btn btn-danger livesWithRemoveButton" type="button" style="margin-top: 2rem; height: 2.25rem; width: 3.5rem;">
+                      <img src="/open-iconic/svg/trash.svg" alt="trash icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+                  </button>
+              </div>
+            </div>
+          </div>
+          `;
+
+          $('#livesWithForm').append(html);
+        });
+
+        $('body').on('click', 'button.livesWithRemoveButton', function()
+        {
+          const container = $(this).parent().parent().parent();
+          container.find('input[type="text"]').val('REMOVED');
+          container.find('input[type="number"]').val('0');
+          container.addClass('d-none');//d-none from boostrap
+        });
+
+        $('#beenAroundAddButton').on('click', function() {
+          const count = $('#beenAroundForm > div').length;
+          const html = `
+          <div class="mt-2 border-top">
+            <div class="row">
+              <div class="col-md-6">
+                  <label for="beenAround[${count}][firstName]">First Name</label>
+                  <input type="text" class="form-control" id="beenAround[${count}][firstName]" name="beenAround[${count}][firstName]" value="" required>
+              </div>
+              <div class="col-md-5">
+                <label for="beenAround[${count}][lastName]">Last Name</label>
+                <input type="text" class="form-control" id="beenAround[${count}][lastName]" name="beenAround[${count}][lastName]" value="">
+              </div>
+              <div class="col-md-1">
+                <button class="btn btn-danger beenAroundRemoveButton" type="button" style="margin-top: 2rem; height: 2.25rem; width: 3.5rem;">
+                    <img src="/open-iconic/svg/trash.svg" alt="trash icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label for="beenAround[${count}][dateLastSaw]">Date you last saw them</label>
+                <input type="text" class="form-control datepicker" id="beenAround[${count}][dateLastSaw]" name="beenAround[${count}][dateLastSaw]" value="" required>
+              </div>
+              <div class="col-md-6">
+                <label for="beenAround[${count}][whereLastSaw]">Where you last saw them</label>
+                <input type="text" class="form-control" id="beenAround[${count}][whereLastSaw]" name="beenAround[${count}][whereLastSaw]" value="" required>
+              </div>
+            </div>
+          </div>
+          `;
+
+          $('#beenAroundForm').append(html);
+
+          initializeDatepicker();
+        });
+
+        $('body').on('click', 'button.beenAroundRemoveButton', function()
+        {
+          const container = $(this).parent().parent().parent();
+          container.find('input[type="text"]').val('REMOVED');
+          container.addClass('d-none');
+        });
+
+        $('#activityAddButton').on('click', function() {
+          const count = $('#activityForm > div').length;
+          const html = `
+          <div class="mt-2 border-top">
+            <div class="row">
+              <div class="col-md-9">
+                  <label for="activity[${count}][activity]">Activity</label>
+                  <input type="text" class="form-control" id="activity[${count}][activity]" name="activity[${count}][activity]" value="" required>
+              </div>
+              <div class="col-md-2">
+                <label for="activity[${count}][date]">Date</label>
+                <input type="text" class="form-control datepicker" id="activity[${count}][date]" name="activity[${count}][date]" value="" required>
+              </div>
+              <div class="col-md-1">
+                <button class="btn btn-danger activityRemoveButton" type="button" style="margin-top: 2rem; height: 2.25rem; width: 3.5rem;">
+                    <img src="/open-iconic/svg/trash.svg" alt="trash icon" style="filter: invert(100%); width: auto; height: 12px; margin-bottom: 4px;">
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label for="activity[${count}][location]">Location</label>
+                <input type="text" class="form-control" id="activity[${count}][location]" name="activity[${count}][location]" value="" required>
+              </div>
+            </div>
+          </div>
+        </div>
+          `;
+
+          $('#activityForm').append(html);
+
+          initializeDatepicker();
+        });
+
+        $('body').on('click', 'button.activityRemoveButton', function()
+        {
+          const container = $(this).parent().parent().parent();
+          container.find('input[type="text"]').val('REMOVED');
+          container.addClass('d-none');
+        });
+
+        initializeDatepicker();
+      })(jQuery);
+    });
+  </script>
+
+  <%- include('./partials/_bottom') %>

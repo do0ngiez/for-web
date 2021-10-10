@@ -23,7 +23,11 @@ const firebaseConfig = {
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-// ADMIN
+///Follow comments to navigate
+///API
+///PAGES
+
+//ADMIN AREA
 async function getAdmins() {
   let data = [];
   const ref = firebaseApp.firestore().collection("admins");
@@ -65,7 +69,7 @@ async function updateAdmin(id, data) {
   await ref.doc(id).update(data);
 }
 
-// USERS AREA
+//USERS AREA
 async function getUsers(statusFilter, fromDateFilter, toDateFilter) {
   let data = [];
   const ref = firebaseApp.firestore().collection("users");
@@ -122,6 +126,43 @@ async function updateUser(id, data) {
   await ref.doc(id).update(data);
 }
 
+//adding to firebase
+async function createContactTracingForm(data) {
+  const ref = firebase.firestore().collection("contact-tracing-form");
+  const { id } = await ref.add(data);
+  return id;
+}
+
+async function createCtLivesWith(ctId, collection) {
+  const ref = firebase.firestore().collection("ct-livesWith");
+  collection.forEach(async data => {
+    await ref.add({
+      ...data,
+      ctId
+    })
+  });
+}
+
+async function createCtBeenAround(ctId, collection) {
+  const ref = firebase.firestore().collection("ct-beenAround");
+  collection.forEach(async data => {
+    await ref.add({
+      ...data,
+      ctId
+    })
+  });
+}
+
+async function createCtActivity(ctId, collection) {
+  const ref = firebase.firestore().collection("ct-activity");
+  collection.forEach(async data => {
+    await ref.add({
+      ...data,
+      ctId
+    })
+  });
+}
+
 /////////////////////
 
 const app = express();
@@ -165,8 +206,8 @@ function checkIsAdmin(req, res, next) {
 }
 
 // PAGES AREA
-app.get("/", (request, response) => { //gets the index after logging in
-  if (request.session.user)
+app.get("/", (request, response) => { //gets the index after logging in (ADMIN SIDE)
+  if (request.session.isAdmin)
   {
     response.render("index", {
       title: "BlueDu",
@@ -176,9 +217,19 @@ app.get("/", (request, response) => { //gets the index after logging in
       message: request.query.message,
     });
   }
+  else if (request.session.user) //NORMAL USER
+  {
+    response.render("formIndex", {
+      title: "BlueDu Forms",
+      pageName: "",
+      currentUser: request.session.user,
+      isAdmin: request.session.isAdmin,
+      message: request.query.message,
+    });
+  }
   else
   {
-    response.render("login", {
+    response.render("login", { //LOGIN
       title: "Login",
       pageName: "login",
       currentUser: request.session.user,
@@ -188,24 +239,50 @@ app.get("/", (request, response) => { //gets the index after logging in
   }
 });
 
-// app.get("/login", (request, response) => {
-//   response.render("login", {
-//     title: "Login",
-//     pageName: "login",
-//     currentUser: request.session.user,
-//     isAdmin: request.session.isAdmin,
-//     message: request.query.message,
-//   });
-// });
-
-app.get("/profile", checkIsUser, (request, response) => {
-  response.render("profile", {
-    title: "Profile",
-    pageName: "profile",
+//CT FORM GET, POST
+app.get("/contactTracingForm", checkIsUser, (request, response) => {
+  response.render("contactTracingForm", {
+    title: "Contact Tracing Form",
+    pageName: "contactTracingForm",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     message: request.query.message,
   });
+});
+
+app.post("/contactTracingForm", checkIsUser, async (request, response) => {
+  const livesWith = request.body.livesWith.filter(p => p.firstName != "REMOVED");
+  const beenAround = request.body.beenAround.filter(p => p.firstName != "REMOVED");
+  const activity = request.body.activity.filter(p => p.activity != "REMOVED");
+
+  const ctId = await createContactTracingForm({
+    userFirstName: request.session.user.firstName,
+    userLastName: request.session.user.lastName,
+    userAddress: request.session.user.address,
+    userPhoneNumber: request.session.user.phoneNumber,
+    submissionDate: new Date()
+  });
+
+  await createCtLivesWith(ctId, livesWith);
+  await createCtBeenAround(ctId, beenAround);
+  await createCtActivity(ctId, activity);
+
+  response.redirect(`/?message=Contact Tracing Form successfully submitted.`);
+});
+
+//MONITORING FORM GET, POST
+app.get("/monitoringForm", checkIsUser, (request, response) => {
+  response.render("monitoringForm", {
+    title: "Monitoring Form",
+    pageName: "monitoringForm",
+    currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
+    message: request.query.message,
+  });
+});
+
+app.post("/monitoringForm", checkIsUser, (request, response) => {
+  response.redirect(`/?message=Monitoring Form successfully submitted.`);
 });
 
 app.get("/archived", checkIsAdmin, (request, response) => {
@@ -311,18 +388,33 @@ app.post(
 );
 
 ///USERS
+app.get("/profile", checkIsUser, (request, response) => {
+  response.render("profile", {
+    title: "Profile",
+    pageName: "profile",
+    currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
+    message: request.query.message,
+  });
+});
+
 app.post("/profile", checkIsUser, async function (request, response) {
   await updateUser(request.session.user.id, {
     firstName: request.body.firstName,
     lastName: request.body.lastName,
+    address: request.body.address,
+    phoneNumber: request.body.phoneNumber,
   });
 
   request.session.user.firstName = request.body.firstName;
-  request.session.user.lastName = request.body.lastName;
+    request.session.user.lastName = request.body.lastName;
+    request.session.user.address = request.body.address;
+    request.session.user.phoneNumber = request.body.phoneNumber;
 
   response.redirect(`/profile?message=Profile successfully updated.`);
 });
 
+///USERS-ADMIN SIDE
 app.post(
   "/updateUserDetails",
   checkIsAdmin,
@@ -338,6 +430,7 @@ app.post(
   }
 );
 
+//ADMIN LOGIN
 app.get("/login-admin", (request, response) => { //gets to show the login-admin page
   response.render("login-admin", {
     title: "Admin Login",
@@ -352,7 +445,7 @@ app.get("/logout", function (request, response) {
   request.session.destroy(() => response.redirect("/"));
 });
 
-// api
+//API LOGIN-USER SIDE
 app.post("/api/login", async function (request, response) {
   if (!request.body.username || !request.body.password) {
     response.json({
@@ -385,6 +478,7 @@ app.post("/api/login", async function (request, response) {
   }
 });
 
+//API LOGIN-ADMIN SIDE
 app.post("/api/login-admin", async function (request, response) {
   if (!request.body.username || !request.body.password) {
     response.json({
