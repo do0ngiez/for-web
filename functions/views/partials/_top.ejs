@@ -65,8 +65,6 @@
                         <% } else { %>
                             <li class="nav-item mx-5">
                                 <a class="nav-link <%= pageName === '' && 'active' %>" href="/">
-                                    <img src="/open-iconic/svg/info.svg" alt="person icon"
-                                        style="filter: invert(58%) sepia(41%) saturate(3790%) hue-rotate(2deg) brightness(99%) contrast(102%); width: auto; height: 13px; margin-bottom: 4px;">
                                     Index
                                 </a>
                             </li>
@@ -89,14 +87,13 @@
                                     <%= currentUser.firstName %>
                                         <%= currentUser.lastName %>
                                 </span> <!-- concat name!! :) -->
-                                <img src="/open-iconic/svg/person.svg" alt="person icon"
-                                    style="filter: invert(1); width: auto; height: 11px; margin-bottom: 3px;">
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <% if (isAdmin) { %>
                                     <a class="dropdown-item" href="/usersettings">User Settings</a>
                                     <% } else { %>
-                                        <a class="dropdown-item" href="/profile">Profile</a>
+                                        <a class="dropdown-item" href="/profile">My Profile <img src="/open-iconic/svg/person.svg" alt="person icon"
+                                            style="width: auto; height: 11px; margin-bottom: 3px;"></a>
                                         <div class="dropdown-divider"></div>
                                         <% } %>
                                             <a class="dropdown-item" href="/logout" onclick="return confirmLogout()">

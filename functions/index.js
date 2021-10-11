@@ -5,6 +5,7 @@ const session = require("express-session");
 const { FirestoreStore } = require("@google-cloud/connect-firestore"); //connection to cloud firestore
 const engines = require("consolidate");
 const crypto = require("crypto");
+const dayjs = require('dayjs');
 
 const algorithm = "aes-256-cbc"; //cypherblock thing
 const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE"; //random 32
@@ -126,7 +127,7 @@ async function updateUser(id, data) {
   await ref.doc(id).update(data);
 }
 
-//adding to firebase
+//adding to firebase (student side forms, ct n monitoring)
 async function createContactTracingForm(data) {
   const ref = firebase.firestore().collection("contact-tracing-form");
   const { id } = await ref.add(data);
@@ -161,6 +162,71 @@ async function createCtActivity(ctId, collection) {
       ctId
     })
   });
+}
+
+async function createMonitoringForm(data) {
+  const ref = firebase.firestore().collection("monitoring-form");
+  const { id } = await ref.add(data);
+  return id;
+}
+
+async function createMSelfMonitoring(mId, collection) {
+  const ref = firebase.firestore().collection("m-selfMonitoring");
+  collection.forEach(async data => {
+    await ref.add({
+      ...data,
+      mId
+    })
+  });
+}
+
+async function updateMonitoringForm(id, data) {
+  const ref = firebaseApp.firestore().collection("monitoring-form");
+  await ref.doc(id).update(data);
+}
+
+async function updateMSelfMonitoring(id, data) {
+  const ref = firebaseApp.firestore().collection("m-selfMonitoring");
+  await ref.doc(id).update(data);
+}
+
+async function getAllMonitoringForm() {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("monitoring-form");
+  await ref.get().then((snap) =>
+    snap.forEach((doc) => {
+      const entry = doc.data();
+      entry.id = doc.id;
+      data.push(entry);
+    })
+  );
+  return data;
+}
+
+async function getAllMonitoringFormForUser(userId) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("monitoring-form");
+  await ref.where("userId", "==", userId).get().then((snap) =>
+    snap.forEach((doc) => {
+      const entry = doc.data();
+      entry.id = doc.id;
+      data.push(entry);
+    })
+  );
+  return data;
+}
+
+async function getAllMSelfMonitoringForMonitoringForm(mId) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("m-selfMonitoring");
+  await ref.where("mId", "==", mId).get().then((snap) =>
+    snap.forEach((doc) => {
+      const entry = doc.data();
+      entry.id = doc.id;
+      data.push(entry);
+    })
+  );
+  return data;
 }
 
 /////////////////////
@@ -271,17 +337,88 @@ app.post("/contactTracingForm", checkIsUser, async (request, response) => {
 });
 
 //MONITORING FORM GET, POST
-app.get("/monitoringForm", checkIsUser, (request, response) => {
+app.get("/monitoringForm", checkIsUser, async (request, response) => {
+  // const currentMonitoringForm = {
+  //   dateStarted: '2021-10-11',
+  //   dateSymptomsStarted: '2021-10-11',
+  //   selfMonitoring: [{
+  //     date: '10/11',
+  //     dailyTemperature: 28,
+  //     cold: true,
+  //     diarrhea: true
+  //   }]
+  // };
+  // const currentMonitoringForm = null;
+  const allMonitoringForm = await getAllMonitoringFormForUser(request.session.user.id);
+  let currentMonitoringForm = allMonitoringForm.length ? allMonitoringForm[allMonitoringForm.length - 1] : null;
+  console.log(currentMonitoringForm);
+  if (currentMonitoringForm)
+  {
+    const selfMonitoring = await getAllMSelfMonitoringForMonitoringForm(currentMonitoringForm.id);
+    selfMonitoring.sort((a, b) => dayjs(a.date, "MM/DD") > dayjs(b.date, "MM/DD") ? 1 : -1);
+    currentMonitoringForm = {
+      ...currentMonitoringForm,
+      selfMonitoring
+    };
+  }
+
   response.render("monitoringForm", {
     title: "Monitoring Form",
     pageName: "monitoringForm",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     message: request.query.message,
+    currentMonitoringForm
   });
 });
 
-app.post("/monitoringForm", checkIsUser, (request, response) => {
+app.post("/monitoringForm", checkIsUser, async (request, response) => {
+  if (request.body.mId)
+  {
+    await updateMonitoringForm(request.body.mId, {
+      dateStarted: request.body.dateStarted,
+      dateSymptomsStarted: request.body.dateSymptomsStarted
+    });
+    request.body.selfMonitoring.forEach(async selfMonitoring => {
+      await updateMSelfMonitoring(selfMonitoring.id, {
+        date: selfMonitoring.date,
+        dailyTemperature: selfMonitoring.dailyTemperature,
+        noSymptoms: selfMonitoring.noSymptoms ? true : false,
+        cough: selfMonitoring.cough ? true : false,
+        cold: selfMonitoring.cold ? true : false,
+        diarrhea: selfMonitoring.diarrhea ? true : false,
+        soreThroat: selfMonitoring.soreThroat ? true : false,
+        headache: selfMonitoring.headache ? true : false,
+        fatigue: selfMonitoring.fatigue ? true : false,
+        difficultyOfBreathing: selfMonitoring.difficultyOfBreathing ? true : false,
+        others: selfMonitoring.others ? true : false,
+      });
+    })
+  }
+  else
+  {
+    const mId = await createMonitoringForm({
+      dateStarted: request.body.dateStarted,
+      dateSymptomsStarted: request.body.dateSymptomsStarted,
+      userId: request.session.user.id
+    });
+    await createMSelfMonitoring(mId, request.body.selfMonitoring.map(selfMonitoring => {
+      return {
+        date: selfMonitoring.date,
+        dailyTemperature: selfMonitoring.dailyTemperature,
+        noSymptoms: selfMonitoring.noSymptoms ? true : false,
+        cough: selfMonitoring.cough ? true : false,
+        cold: selfMonitoring.cold ? true : false,
+        diarrhea: selfMonitoring.diarrhea ? true : false,
+        soreThroat: selfMonitoring.soreThroat ? true : false,
+        headache: selfMonitoring.headache ? true : false,
+        fatigue: selfMonitoring.fatigue ? true : false,
+        difficultyOfBreathing: selfMonitoring.difficultyOfBreathing ? true : false,
+        others: selfMonitoring.others ? true : false,
+      };
+    }));
+  }
+
   response.redirect(`/?message=Monitoring Form successfully submitted.`);
 });
 
