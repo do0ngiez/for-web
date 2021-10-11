@@ -338,20 +338,9 @@ app.post("/contactTracingForm", checkIsUser, async (request, response) => {
 
 //MONITORING FORM GET, POST
 app.get("/monitoringForm", checkIsUser, async (request, response) => {
-  // const currentMonitoringForm = {
-  //   dateStarted: '2021-10-11',
-  //   dateSymptomsStarted: '2021-10-11',
-  //   selfMonitoring: [{
-  //     date: '10/11',
-  //     dailyTemperature: 28,
-  //     cold: true,
-  //     diarrhea: true
-  //   }]
-  // };
-  // const currentMonitoringForm = null;
-  const allMonitoringForm = await getAllMonitoringFormForUser(request.session.user.id);
+  let allMonitoringForm = await getAllMonitoringFormForUser(request.session.user.id);
+  // todo: filter monitoringForm, submit all
   let currentMonitoringForm = allMonitoringForm.length ? allMonitoringForm[allMonitoringForm.length - 1] : null;
-  console.log(currentMonitoringForm);
   if (currentMonitoringForm)
   {
     const selfMonitoring = await getAllMSelfMonitoringForMonitoringForm(currentMonitoringForm.id);
