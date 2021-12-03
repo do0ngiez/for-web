@@ -164,7 +164,7 @@ input.bg-addu:focus {
 }
 
 .bg-image {
-  background-image: url('/images/AdDUPool.jpg');
+  background-image: url('/images/square/defaultWhiteBG.jpg');
   background-size: cover;
   background-position: center center;
 }

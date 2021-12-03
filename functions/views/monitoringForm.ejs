@@ -107,7 +107,7 @@
                         <td class="tableSticky">Daily Temperature*</td>
                         <% for( let index = 0; index < 14; index++ ) { %>
                             <td>
-                                <input type="number" name="selfMonitoring[<%= index %>][dailyTemperature]" id="selfMonitoring[<%= index %>][dailyTemperature]" value="<%= currentMonitoringForm?.selfMonitoring[index]?.dailyTemperature %>" style="width: 4.25rem;">
+                                <input type="number" name="selfMonitoring[<%= index %>][dailyTemperature]" id="selfMonitoring[<%= index %>][dailyTemperature]" value="<%= currentMonitoringForm?.selfMonitoring[index]?.dailyTemperature %>" style="width: 4.25rem;" required>
                             </td>
                         <% } %>
                     </tr>

@@ -276,7 +276,7 @@ app.get("/", (request, response) => { //gets the index after logging in (ADMIN S
   if (request.session.isAdmin)
   {
     response.render("index", {
-      title: "BlueDu",
+      title: "BlueDu Dashboard",
       pageName: "",
       currentUser: request.session.user,
       isAdmin: request.session.isAdmin,
