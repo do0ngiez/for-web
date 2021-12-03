@@ -5,7 +5,7 @@ const session = require("express-session");
 const { FirestoreStore } = require("@google-cloud/connect-firestore"); //connection to cloud firestore
 const engines = require("consolidate");
 const crypto = require("crypto");
-const dayjs = require('dayjs');
+const dayjs = require("dayjs");
 
 const algorithm = "aes-256-cbc"; //cypherblock thing
 const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE"; //random 32
@@ -136,31 +136,31 @@ async function createContactTracingForm(data) {
 
 async function createCtLivesWith(ctId, collection) {
   const ref = firebase.firestore().collection("ct-livesWith");
-  collection.forEach(async data => {
+  collection.forEach(async (data) => {
     await ref.add({
       ...data,
-      ctId
-    })
+      ctId,
+    });
   });
 }
 
 async function createCtBeenAround(ctId, collection) {
   const ref = firebase.firestore().collection("ct-beenAround");
-  collection.forEach(async data => {
+  collection.forEach(async (data) => {
     await ref.add({
       ...data,
-      ctId
-    })
+      ctId,
+    });
   });
 }
 
 async function createCtActivity(ctId, collection) {
   const ref = firebase.firestore().collection("ct-activity");
-  collection.forEach(async data => {
+  collection.forEach(async (data) => {
     await ref.add({
       ...data,
-      ctId
-    })
+      ctId,
+    });
   });
 }
 
@@ -172,11 +172,11 @@ async function createMonitoringForm(data) {
 
 async function createMSelfMonitoring(mId, collection) {
   const ref = firebase.firestore().collection("m-selfMonitoring");
-  collection.forEach(async data => {
+  collection.forEach(async (data) => {
     await ref.add({
       ...data,
-      mId
-    })
+      mId,
+    });
   });
 }
 
@@ -206,26 +206,32 @@ async function getAllMonitoringForm() {
 async function getAllMonitoringFormForUser(userId) {
   let data = [];
   const ref = firebaseApp.firestore().collection("monitoring-form");
-  await ref.where("userId", "==", userId).get().then((snap) =>
-    snap.forEach((doc) => {
-      const entry = doc.data();
-      entry.id = doc.id;
-      data.push(entry);
-    })
-  );
+  await ref
+    .where("userId", "==", userId)
+    .get()
+    .then((snap) =>
+      snap.forEach((doc) => {
+        const entry = doc.data();
+        entry.id = doc.id;
+        data.push(entry);
+      })
+    );
   return data;
 }
 
 async function getAllMSelfMonitoringForMonitoringForm(mId) {
   let data = [];
   const ref = firebaseApp.firestore().collection("m-selfMonitoring");
-  await ref.where("mId", "==", mId).get().then((snap) =>
-    snap.forEach((doc) => {
-      const entry = doc.data();
-      entry.id = doc.id;
-      data.push(entry);
-    })
-  );
+  await ref
+    .where("mId", "==", mId)
+    .get()
+    .then((snap) =>
+      snap.forEach((doc) => {
+        const entry = doc.data();
+        entry.id = doc.id;
+        data.push(entry);
+      })
+    );
   return data;
 }
 
@@ -272,9 +278,9 @@ function checkIsAdmin(req, res, next) {
 }
 
 // PAGES AREA
-app.get("/", (request, response) => { //gets the index after logging in (ADMIN SIDE)
-  if (request.session.isAdmin)
-  {
+app.get("/", (request, response) => {
+  //gets the index after logging in (ADMIN SIDE)
+  if (request.session.isAdmin) {
     response.render("index", {
       title: "BlueDu Dashboard",
       pageName: "",
@@ -282,9 +288,8 @@ app.get("/", (request, response) => { //gets the index after logging in (ADMIN S
       isAdmin: request.session.isAdmin,
       message: request.query.message,
     });
-  }
-  else if (request.session.user) //NORMAL USER
-  {
+  } else if (request.session.user) {
+    //NORMAL USER
     response.render("formIndex", {
       title: "BlueDu Forms",
       pageName: "",
@@ -292,10 +297,9 @@ app.get("/", (request, response) => { //gets the index after logging in (ADMIN S
       isAdmin: request.session.isAdmin,
       message: request.query.message,
     });
-  }
-  else
-  {
-    response.render("login", { //LOGIN
+  } else {
+    response.render("login", {
+      //LOGIN
       title: "Login",
       pageName: "login",
       currentUser: request.session.user,
@@ -317,16 +321,17 @@ app.get("/contactTracingForm", checkIsUser, (request, response) => {
 });
 
 app.post("/contactTracingForm", checkIsUser, async (request, response) => {
-  const livesWith = request.body.livesWith.filter(p => p.firstName != "REMOVED");
-  const beenAround = request.body.beenAround.filter(p => p.firstName != "REMOVED");
-  const activity = request.body.activity.filter(p => p.activity != "REMOVED");
+  const livesWith = request.body.livesWith.filter(
+    (p) => p.firstName != "REMOVED"
+  );
+  const beenAround = request.body.beenAround.filter(
+    (p) => p.firstName != "REMOVED"
+  );
+  const activity = request.body.activity.filter((p) => p.activity != "REMOVED");
 
   const ctId = await createContactTracingForm({
-    userFirstName: request.session.user.firstName,
-    userLastName: request.session.user.lastName,
-    userAddress: request.session.user.address,
-    userPhoneNumber: request.session.user.phoneNumber,
-    submissionDate: new Date()
+    userId: request.session.user.id,
+    submissionDate: new Date(),
   });
 
   await createCtLivesWith(ctId, livesWith);
@@ -338,16 +343,28 @@ app.post("/contactTracingForm", checkIsUser, async (request, response) => {
 
 //MONITORING FORM GET, POST
 app.get("/monitoringForm", checkIsUser, async (request, response) => {
-  let allMonitoringForm = await getAllMonitoringFormForUser(request.session.user.id);
-  // todo: filter monitoringForm, submit all
-  let currentMonitoringForm = allMonitoringForm.length ? allMonitoringForm[allMonitoringForm.length - 1] : null;
-  if (currentMonitoringForm)
-  {
-    const selfMonitoring = await getAllMSelfMonitoringForMonitoringForm(currentMonitoringForm.id);
-    selfMonitoring.sort((a, b) => dayjs(a.date, "MM/DD") > dayjs(b.date, "MM/DD") ? 1 : -1);
+  let allMonitoringForm = await getAllMonitoringFormForUser(
+    request.session.user.id
+  );
+  let filteredMontitoringForm = allMonitoringForm.filter(
+    (form) => !form.isComplete
+  );
+  filteredMontitoringForm.sort((a, b) =>
+    dayjs(a.dateStarted) > dayjs(b.dateStarted) ? 1 : -1
+  );
+  let currentMonitoringForm = filteredMontitoringForm.length
+    ? filteredMontitoringForm[filteredMontitoringForm.length - 1]
+    : null;
+  if (currentMonitoringForm) {
+    const selfMonitoring = await getAllMSelfMonitoringForMonitoringForm(
+      currentMonitoringForm.id
+    );
+    selfMonitoring.sort((a, b) =>
+      dayjs(a.date, "MM/DD") > dayjs(b.date, "MM/DD") ? 1 : -1
+    );
     currentMonitoringForm = {
       ...currentMonitoringForm,
-      selfMonitoring
+      selfMonitoring,
     };
   }
 
@@ -357,18 +374,21 @@ app.get("/monitoringForm", checkIsUser, async (request, response) => {
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     message: request.query.message,
-    currentMonitoringForm
+    currentMonitoringForm,
   });
 });
 
 app.post("/monitoringForm", checkIsUser, async (request, response) => {
-  if (request.body.mId)
-  {
+  if (request.body.mId) {
     await updateMonitoringForm(request.body.mId, {
       dateStarted: request.body.dateStarted,
-      dateSymptomsStarted: request.body.dateSymptomsStarted
+      dateSymptomsStarted: request.body.dateSymptomsStarted,
+      isComplete:
+        dayjs() >= dayjs(request.body.dateStarted).add(14, "day")
+          ? true
+          : false,
     });
-    request.body.selfMonitoring.forEach(async selfMonitoring => {
+    request.body.selfMonitoring.forEach(async (selfMonitoring) => {
       await updateMSelfMonitoring(selfMonitoring.id, {
         date: selfMonitoring.date,
         dailyTemperature: selfMonitoring.dailyTemperature,
@@ -379,33 +399,38 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
         soreThroat: selfMonitoring.soreThroat ? true : false,
         headache: selfMonitoring.headache ? true : false,
         fatigue: selfMonitoring.fatigue ? true : false,
-        difficultyOfBreathing: selfMonitoring.difficultyOfBreathing ? true : false,
+        difficultyOfBreathing: selfMonitoring.difficultyOfBreathing
+          ? true
+          : false,
         others: selfMonitoring.others ? true : false,
       });
-    })
-  }
-  else
-  {
+    });
+  } else {
     const mId = await createMonitoringForm({
       dateStarted: request.body.dateStarted,
       dateSymptomsStarted: request.body.dateSymptomsStarted,
-      userId: request.session.user.id
+      userId: request.session.user.id,
     });
-    await createMSelfMonitoring(mId, request.body.selfMonitoring.map(selfMonitoring => {
-      return {
-        date: selfMonitoring.date,
-        dailyTemperature: selfMonitoring.dailyTemperature,
-        noSymptoms: selfMonitoring.noSymptoms ? true : false,
-        cough: selfMonitoring.cough ? true : false,
-        cold: selfMonitoring.cold ? true : false,
-        diarrhea: selfMonitoring.diarrhea ? true : false,
-        soreThroat: selfMonitoring.soreThroat ? true : false,
-        headache: selfMonitoring.headache ? true : false,
-        fatigue: selfMonitoring.fatigue ? true : false,
-        difficultyOfBreathing: selfMonitoring.difficultyOfBreathing ? true : false,
-        others: selfMonitoring.others ? true : false,
-      };
-    }));
+    await createMSelfMonitoring(
+      mId,
+      request.body.selfMonitoring.map((selfMonitoring) => {
+        return {
+          date: selfMonitoring.date,
+          dailyTemperature: selfMonitoring.dailyTemperature,
+          noSymptoms: selfMonitoring.noSymptoms ? true : false,
+          cough: selfMonitoring.cough ? true : false,
+          cold: selfMonitoring.cold ? true : false,
+          diarrhea: selfMonitoring.diarrhea ? true : false,
+          soreThroat: selfMonitoring.soreThroat ? true : false,
+          headache: selfMonitoring.headache ? true : false,
+          fatigue: selfMonitoring.fatigue ? true : false,
+          difficultyOfBreathing: selfMonitoring.difficultyOfBreathing
+            ? true
+            : false,
+          others: selfMonitoring.others ? true : false,
+        };
+      })
+    );
   }
 
   response.redirect(`/?message=Monitoring Form successfully submitted.`);
@@ -533,9 +558,9 @@ app.post("/profile", checkIsUser, async function (request, response) {
   });
 
   request.session.user.firstName = request.body.firstName;
-    request.session.user.lastName = request.body.lastName;
-    request.session.user.address = request.body.address;
-    request.session.user.phoneNumber = request.body.phoneNumber;
+  request.session.user.lastName = request.body.lastName;
+  request.session.user.address = request.body.address;
+  request.session.user.phoneNumber = request.body.phoneNumber;
 
   response.redirect(`/profile?message=Profile successfully updated.`);
 });
@@ -557,7 +582,8 @@ app.post(
 );
 
 //ADMIN LOGIN
-app.get("/login-admin", (request, response) => { //gets to show the login-admin page
+app.get("/login-admin", (request, response) => {
+  //gets to show the login-admin page
   response.render("login-admin", {
     title: "Admin Login",
     pageName: "login-admin",
