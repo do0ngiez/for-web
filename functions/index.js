@@ -484,7 +484,7 @@ app.get("/usersettings", checkIsAdmin, async (request, response) => {
   });
 });
 
-///ADMINS
+///ADMIN
 app.post(
   "/updateAdminDetails",
   checkIsAdmin,
@@ -594,7 +594,15 @@ app.get("/login-admin", (request, response) => {
 });
 
 app.get("/logout", function (request, response) {
-  request.session.destroy(() => response.redirect("/"));
+  const isAdmin = request.session.isAdmin;
+  request.session.destroy(() => {
+    if (isAdmin) {
+      response.redirect("/login-admin")
+    }
+    else {
+      response.redirect("/")
+    }
+  });
 });
 
 //API LOGIN-USER SIDE
@@ -613,7 +621,7 @@ app.post("/api/login", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-        encrypted.toString("hex").toUpperCase()
+      encrypted.toString("hex").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;
@@ -646,7 +654,7 @@ app.post("/api/login-admin", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-        encrypted.toString("hex").toUpperCase()
+      encrypted.toString("hex").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;

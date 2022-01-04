@@ -83,6 +83,11 @@ a.btn-outline-adduforms:focus {
   padding: 2%;
 }
 
+.bg-adduGrey {
+  background-color: #9d9c9c !important;
+  color: white;
+}
+
 .color-adduOrange {
   color: #f98500;
 }
