@@ -128,6 +128,22 @@ async function updateUser(id, data) {
 }
 
 //adding to firebase (student side forms, ct n monitoring)
+async function getAllContactTracingFormForUser(userId) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("contact-tracing-form");
+  await ref
+    .where("userId", "==", userId)
+    .get()
+    .then((snap) =>
+      snap.forEach((doc) => {
+        const entry = doc.data();
+        entry.id = doc.id;
+        data.push(entry);
+      })
+    );
+  return data;
+}
+
 async function createContactTracingForm(data) {
   const ref = firebase.firestore().collection("contact-tracing-form");
   const { id } = await ref.add(data);
@@ -258,6 +274,8 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+//Login Checker if User OR Admin
 
 function checkIsUser(req, res, next) {
   if (req.session.user && !req.session.isAdmin) {
@@ -452,30 +470,74 @@ app.get("/dashboard", checkIsAdmin, async (request, response) => {
     request.query.toDateFilter
   );
   // console.log(users); ---user checker
-  let selectedUser = null;
-  if (request.query.id) {
-    selectedUser = await getUserById(request.query.id);
-  }
   response.render("dashboard", {
     title: "Dashboard",
     pageName: "dashboard",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     users,
-    selectedUser,
     message: request.query.message,
   });
 });
 
-app.get("/usersettings", checkIsAdmin, async (request, response) => {
+app.get("/userDetails", checkIsAdmin, async (request, response) => {
+  let selectedUser = null;
+  let contactTracingForms = null;
+  let monitoringForms = null;
+  if (request.query.id) {
+    selectedUser = await getUserById(request.query.id);
+    contactTracingForms = await getAllContactTracingFormForUser(
+      request.query.id
+    );
+    monitoringForms = await getAllMonitoringFormForUser(request.query.id);
+  }
+  response.render("userDetails", {
+    title: "User Details",
+    pageName: "userDetails",
+    currentUser: request.session.user,
+    isAdmin: request.session.isAdmin,
+    selectedUser,
+    contactTracingForms,
+    monitoringForms,
+  });
+});
+
+
+app.get(
+  "/userContactTracingFormDetails",
+  checkIsAdmin,
+  async (request, response) => {
+    response.render("userContactTracingFormDetails", {
+      title: "User Contact Tracing Form Details",
+      pageName: "userContactTracingFormDetails",
+      currentUser: request.session.user,
+      isAdmin: request.session.isAdmin,
+    });
+  }
+);
+
+app.get(
+  "/userMonitoringFormDetails",
+  checkIsAdmin,
+  async (request, response) => {
+    response.render("userMonitoringFormDetails", {
+      title: "User Self Monitoring Form Details",
+      pageName: "userMonitoringFormDetails",
+      currentUser: request.session.user,
+      isAdmin: request.session.isAdmin,
+    });
+  }
+);
+
+app.get("/adminsettings", checkIsAdmin, async (request, response) => {
   const admins = await getAdmins();
   let selectedAdmin = null;
   if (request.query.id) {
     selectedAdmin = await getAdminById(request.query.id);
   }
-  response.render("usersettings", {
+  response.render("adminsettings", {
     title: "Settings",
-    pageName: "usersettings",
+    pageName: "adminsettings",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     admins,
@@ -497,7 +559,7 @@ app.post(
       address: request.body.address,
     });
 
-    response.redirect(`/usersettings?message=Details successfully updated.`);
+    response.redirect(`/adminsettings?message=Details successfully updated.`);
   }
 );
 
@@ -506,13 +568,13 @@ app.post(
   checkIsAdmin,
   async function (request, response) {
     if (request.body.newUsername !== request.body.confirmUsername) {
-      response.redirect(`/usersettings?message=Usernames does not match!`);
+      response.redirect(`/adminsettings?message=Usernames do not match! Please try again.`);
     } else {
       await updateAdmin(request.body.id, {
         username: request.body.newUsername,
       });
 
-      response.redirect(`/usersettings?message=Username successfully updated.`);
+      response.redirect(`/adminsettings?message=Username successfully updated.`);
     }
   }
 );
@@ -522,7 +584,7 @@ app.post(
   checkIsAdmin,
   async function (request, response) {
     if (request.body.newPassword !== request.body.confirmPassword) {
-      response.redirect(`/usersettings?message=Passwords does not match!`);
+      response.redirect(`/adminsettings?message=Passwords do not match! Please try again.`);
     } else {
       //encryption for pass update
       const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
@@ -530,15 +592,15 @@ app.post(
       encrypted = Buffer.concat([encrypted, cipher.final()]);
 
       await updateAdmin(request.body.id, {
-        passwordHash: encrypted.toString("hex").toUpperCase(),
+        passwordHash: encrypted.toString("hex").toUpperCase(), //encryption
       });
 
-      response.redirect(`/usersettings?message=Password successfully updated.`);
+      response.redirect(`/adminsettings?message=Password successfully updated.`);
     }
   }
 );
 
-///USERS
+///USERS SIDE
 app.get("/profile", checkIsUser, (request, response) => {
   response.render("profile", {
     title: "Profile",

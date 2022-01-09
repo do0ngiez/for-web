@@ -79,100 +79,7 @@
               <% }) %>
           </tbody>
         </table>
-
-        <% if (selectedUser) { %>
-          <ul class="nav nav-tabs mt-4 pt-3" id="myTab" role="tablist">
-            <li class="nav-item p">
-              <a class="nav-link active" id="userDetails-tab" data-toggle="tab" href="#userDetails" role="tab"
-                aria-controls="userDetails" aria-selected="true">User Details</a>
-            </li>
-            <!-- <li class="nav-item">
-      <a
-        class="nav-link"
-        id="username-tab"
-        data-toggle="tab"
-        href="#username"
-        role="tab"
-        aria-controls="username"
-        aria-selected="false"
-        >Username</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        class="nav-link"
-        id="password-tab"
-        data-toggle="tab"
-        href="#password"
-        role="tab"
-        aria-controls="password"
-        aria-selected="false"
-        >Password</a
-      >
-    </li> -->
-          </ul>
-
-          <!-- User Details Tab -->
-          <div class="tab-content border-left border-right border-bottom" id="myTabContent">
-            <div class="tab-pane fade show active p-4" id="userDetails" role="tabpanel"
-              aria-labelledby="userDetails-tab">
-              <!-- UPDATES DETAILS!!!!!!!!!!! -->
-              <form action="/updateUserDetails" method="POST">
-                <input type="text" hidden name="id" value="<%= selectedUser.id %>" />
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="firstName"> First Name </label>
-                      <input type="text" class="form-control" id="firstName" name="firstName"
-                        value="<%= selectedUser.firstName %>" required />
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="lastName"> Last Name </label>
-                      <input type="text" class="form-control" id="lastName" name="lastName"
-                        value="<%= selectedUser.lastName %>" required />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="Duration"> Duration (sec) </label>
-                      <input type="number" class="form-control" id="duration" name="durationOfContact" <%# SHOULD MATCH
-                        WITH DATABASE!!!!!!!!! %>
-                      value="<%= selectedUser.durationOfContact %>"
-                        required
-                        />
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="Status"> Status </label>
-                      <select class="form-control" name="status" id="status" required>
-                        <option></option>
-                        <option value="Positive">Positive</option>
-                        <option value="Negative">Negative</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <input type="submit" class="btn bg-adduOrange" value="   Save   " />
-              </form>
-            </div>
-
-            <script>
-              window.addEventListener("DOMContentLoaded", function () {
-                (function ($) {
-                  $('#status').val("<%= selectedUser.status %>").change();
-                })(jQuery);
-              });
-            </script>
-            <% } %>
-          </div>
+      </div>
   </div>
 
   <div class="container">
@@ -215,7 +122,7 @@
 
         $("#myTable tbody").on("click", "tr", function () {
           const data = table.row(this).data();
-          window.location = `/dashboard?id=${data[0]}`;
+          window.location = `/userDetails?id=${data[0]}`;
         });
 
         $('#filterButton').on('click', function () {
