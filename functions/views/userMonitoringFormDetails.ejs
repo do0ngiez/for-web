@@ -1,5 +1,195 @@
 <%- include('./partials/_top_admin') %>
 
+<style>
+    .tableSticky {
+        position: sticky;
+        left: 0px;
+        background-color: #f3f3f3;
+        color: #423f3f;
+        font-weight: bold;
+    }
+</style>
+
 <h2>User Self Monitoring Form Details</h2>
+
+<div class="container">
+    <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+        <h4>User Details</h4>
+    </div>
+    <div class="container border pt-3 pl-4 pr-4 pb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="name">
+                    Name
+                </label>
+                <input type="text" id="name" name="name" class="form-control" value="<%= user.firstName %> <%= user.lastName %>" readonly>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="dateStarted">
+                    Date Started
+                </label>
+                <input type="text" id="dateStarted" name="dateStarted" class="form-control" value="<%= monitoringForm?.dateStarted %>" readonly>
+            </div>
+            <div class="col-md-6">
+                <label for="dateSymptomsStarted">
+                    Date symptoms started (if applicable)
+                </label>
+                <input type="text" id="dateSymptomsStarted" name="dateSymptomsStarted" class="form-control datepicker"
+                value="<%= monitoringForm?.dateSymptomsStarted %>" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+        <h4>Self-Monitoring List</h4>
+    </div>
+<!-- Self-Monitoring -->
+    <table class="table table-bordered table-responsive">
+        <thead>
+            <tr>
+                <th class="tableSticky">
+                    Self-monitoring day
+                </th>
+                <!-- 14 days headers -->
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <th class="text-center" style="background-color: #f8f8f8;">
+                        <%= index + 1 %> 
+                    </th>
+                <% } %>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="tableSticky">
+                    Date (MM/DD)
+                </td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td>
+                        <input type="text" name="selfMonitoring[<%= index %>][date]" id="selfMonitoring[<%= index %>][date]" value="<%= selfMonitoring[index]?.date %>" style="width: 4.25rem;" readonly>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Daily Temperature*</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td>
+                        <input type="number" name="selfMonitoring[<%= index %>][dailyTemperature]" id="selfMonitoring[<%= index %>][dailyTemperature]" value="<%= selfMonitoring[index]?.dailyTemperature %>" style="width: 4.25rem;" readonly>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">NO SYMPTOMS ✔</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][noSymptoms]" id="selfMonitoring[<%= index %>][noSymptoms]" <%= selfMonitoring[index]?.noSymptoms ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td colspan="15" class="tableSticky text-center">Pay attention to your health. If you develop any symptoms, check (✔) the box.</td>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Cough</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][cough]" id="selfMonitoring[<%= index %>][cough]" <%= selfMonitoring[index]?.cough ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Cold</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][cold]" id="selfMonitoring[<%= index %>][cold]" <%= selfMonitoring[index]?.cold ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Diarrhea</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][diarrhea]" id="selfMonitoring[<%= index %>][diarrhea]" <%= selfMonitoring[index]?.diarrhea ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Sore throat</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][soreThroat]" id="selfMonitoring[<%= index %>][soreThroat]" <%= selfMonitoring[index]?.soreThroat ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+            
+            <tr>
+                <td class="tableSticky">Headache</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][headache]" id="selfMonitoring[<%= index %>][headache]" <%= selfMonitoring[index]?.headache ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Fatigue</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][fatigue]" id="selfMonitoring[<%= index %>][fatigue]" <%= selfMonitoring[index]?.fatigue ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Difficulty of breathing</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][difficultyOfBreathing]" id="selfMonitoring[<%= index %>][difficultyOfBreathing]" <%= selfMonitoring[index]?.difficultyOfBreathing ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+
+            <tr>
+                <td class="tableSticky">Others: Loss of appetite, loss of taste/smell, body pain</td>
+                <% for( let index = 0; index < 14; index++ ) { %>
+                    <td class="text-center">
+                        <input type="checkbox" name="selfMonitoring[<%= index %>][others]" id="selfMonitoring[<%= index %>][others]" <%= selfMonitoring[index]?.others ? 'checked' : '' %> disabled>
+                    </td>
+                <% } %>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Bottom Portion -->
+    <div class="container mt-0">
+        <div class="row border-bottom border-left border-right p-2" style="background-color: #e6e6e6;">
+            <div class="col-sm">
+                <p class="color-adduOrange text-center"><b>* Avoid the use of fever-reducing medicines (e.g., acetaminophen/Tylenol, ibuprofen/Advil) as much as possible. Fever-reducing medicines could hide early symptoms; if these must be taken, speak with your health care provider.</b></p>
+            </div>
+        </div>
+        <div class="row border-bottom border-left border-right p-2" style="background-color: #f8f8f8;">
+            <div class="col-sm">
+                <p>
+                    <ul>
+                        <li>The person undergoing self – quarantine shall be placed alone in a well ventilated room, preferably with toilet and bathroom.</li>
+                        <li>A member of their family who is in good health is assigned as a caretaker of the person undergoing quarantine.</li>
+                        <li>The assigned caretaker of the quarantined person serves his/her meals at the room door.</li>
+                        <li>Dishes and utensils used by the quarantined person are not used by others.</li>
+                        <li>Visitors, family members, and even caretakers are not allowed in the room of the person undergoing quarantine.</li>
+                        <li>The quarantined person should wear a surgical mask fitted tightly to the nose, mouth and chin should he/she have to interact with another person at least 2 meters of social or physical distance must be maintained.</li>
+                        <li>Proper used of the mask must be observed. If it gets wet or dirty with secretions, it must be disposed of right away. It is recommended that used of mask be limited to a maximum of 8 hours.</li>
+                    <ul>
+                </p>
+            </div>
+        </div>
+    </div>
 
 <%- include('./partials/_bottom') %>

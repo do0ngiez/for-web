@@ -88,7 +88,7 @@
             <h2>Contact Tracing Forms</h2>
             <ul>
               <% contactTracingForms.forEach(contactTracingForm => { %>
-                <li><a href="#"><%= (new Date(contactTracingForm.submissionDate._seconds * 1000)).toISOString().substring(0, 10) %></a></li>
+                <li><a href="/userContactTracingFormDetails?id=<%= contactTracingForm.id %>"><%= (new Date(contactTracingForm.submissionDate._seconds * 1000)).toISOString().substring(0, 10) %></a></li>
               <% }) %>
             <ul>
             </div>
@@ -99,7 +99,7 @@
             <h2>Self Monitoring Forms</h2>
             <ul>
               <% monitoringForms.forEach(monitoringForm => { %>
-                <li><a href="#"><%= monitoringForm.dateStarted %></a></li>
+                <li><a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>"><%= monitoringForm.dateStarted %></a></li>
               <% }) %>
             <ul>
             </div>

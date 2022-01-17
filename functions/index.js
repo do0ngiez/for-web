@@ -144,10 +144,39 @@ async function getAllContactTracingFormForUser(userId) {
   return data;
 }
 
+async function getContactTracingFormById(id) {
+  let data = null;
+  const ref = firebaseApp.firestore().collection("contact-tracing-form");
+  await ref
+    .doc(id)
+    .get()
+    .then((doc) => {
+      data = doc.data();
+      data.id = id;
+    });
+  return data;
+}
+
 async function createContactTracingForm(data) {
   const ref = firebase.firestore().collection("contact-tracing-form");
   const { id } = await ref.add(data);
   return id;
+}
+
+async function getCtLivesWithForCt(ctId) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("ct-livesWith");
+  await ref
+    .where("ctId", "==", ctId)
+    .get()
+    .then((snap) =>
+      snap.forEach((doc) => {
+        const entry = doc.data();
+        entry.id = doc.id;
+        data.push(entry);
+      })
+    );
+  return data;
 }
 
 async function createCtLivesWith(ctId, collection) {
@@ -160,6 +189,22 @@ async function createCtLivesWith(ctId, collection) {
   });
 }
 
+async function getCtBeenAroundForCt(ctId) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("ct-beenAround");
+  await ref
+    .where("ctId", "==", ctId)
+    .get()
+    .then((snap) =>
+      snap.forEach((doc) => {
+        const entry = doc.data();
+        entry.id = doc.id;
+        data.push(entry);
+      })
+    );
+  return data;
+}
+
 async function createCtBeenAround(ctId, collection) {
   const ref = firebase.firestore().collection("ct-beenAround");
   collection.forEach(async (data) => {
@@ -168,6 +213,22 @@ async function createCtBeenAround(ctId, collection) {
       ctId,
     });
   });
+}
+
+async function getCtActivityForCt(ctId) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("ct-activity");
+  await ref
+    .where("ctId", "==", ctId)
+    .get()
+    .then((snap) =>
+      snap.forEach((doc) => {
+        const entry = doc.data();
+        entry.id = doc.id;
+        data.push(entry);
+      })
+    );
+  return data;
 }
 
 async function createCtActivity(ctId, collection) {
@@ -232,6 +293,19 @@ async function getAllMonitoringFormForUser(userId) {
         data.push(entry);
       })
     );
+  return data;
+}
+
+async function getMonitoringFormById(id) {
+  let data = null;
+  const ref = firebaseApp.firestore().collection("monitoring-form");
+  await ref
+    .doc(id)
+    .get()
+    .then((doc) => {
+      data = doc.data();
+      data.id = id;
+    });
   return data;
 }
 
@@ -502,16 +576,33 @@ app.get("/userDetails", checkIsAdmin, async (request, response) => {
   });
 });
 
-
 app.get(
   "/userContactTracingFormDetails",
   checkIsAdmin,
   async (request, response) => {
+    let contactTracingForm;
+    let user;
+    let ctLivesWiths;
+    let ctBeenArounds;
+    let ctActivities;
+    if (request.query.id) {
+      contactTracingForm = await getContactTracingFormById(request.query.id);
+      user = await getUserById(contactTracingForm.userId);
+      ctLivesWiths = await getCtLivesWithForCt(contactTracingForm.id);
+      ctBeenArounds = await getCtBeenAroundForCt(contactTracingForm.id);
+      ctActivities = await getCtActivityForCt(contactTracingForm.id);
+    }
+
     response.render("userContactTracingFormDetails", {
       title: "User Contact Tracing Form Details",
       pageName: "userContactTracingFormDetails",
       currentUser: request.session.user,
       isAdmin: request.session.isAdmin,
+      contactTracingForm,
+      user,
+      ctLivesWiths,
+      ctBeenArounds,
+      ctActivities,
     });
   }
 );
@@ -520,28 +611,41 @@ app.get(
   "/userMonitoringFormDetails",
   checkIsAdmin,
   async (request, response) => {
+    let monitoringForm;
+    let user;
+    let selfMonitoring;
+    if (request.query.id) {
+      monitoringForm = await getMonitoringFormById(request.query.id);
+      user = await getUserById(monitoringForm.userId);
+      selfMonitoring = await getAllMSelfMonitoringForMonitoringForm(
+        monitoringForm.id
+      );
+      selfMonitoring.sort((a, b) =>
+        dayjs(a.date, "MM/DD") > dayjs(b.date, "MM/DD") ? 1 : -1
+      );
+    }
+
     response.render("userMonitoringFormDetails", {
       title: "User Self Monitoring Form Details",
       pageName: "userMonitoringFormDetails",
       currentUser: request.session.user,
       isAdmin: request.session.isAdmin,
+      monitoringForm,
+      user,
+      selfMonitoring,
     });
   }
 );
 
 app.get("/adminsettings", checkIsAdmin, async (request, response) => {
-  const admins = await getAdmins();
-  let selectedAdmin = null;
-  if (request.query.id) {
-    selectedAdmin = await getAdminById(request.query.id);
-  }
+  const admin = (await getAdmins())[0];
+  //console.log(admin);
   response.render("adminsettings", {
     title: "Settings",
     pageName: "adminsettings",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
-    admins,
-    selectedAdmin,
+    admin,
     message: request.query.message,
   });
 });
@@ -559,6 +663,9 @@ app.post(
       address: request.body.address,
     });
 
+    request.session.user.firstName = request.body.firstName;
+    request.session.user.lastName = request.body.lastName;
+
     response.redirect(`/adminsettings?message=Details successfully updated.`);
   }
 );
@@ -568,13 +675,17 @@ app.post(
   checkIsAdmin,
   async function (request, response) {
     if (request.body.newUsername !== request.body.confirmUsername) {
-      response.redirect(`/adminsettings?message=Usernames do not match! Please try again.`);
+      response.redirect(
+        `/adminsettings?message=Usernames do not match! Please try again.`
+      );
     } else {
       await updateAdmin(request.body.id, {
         username: request.body.newUsername,
       });
 
-      response.redirect(`/adminsettings?message=Username successfully updated.`);
+      response.redirect(
+        `/adminsettings?message=Username successfully updated.`
+      );
     }
   }
 );
@@ -584,7 +695,9 @@ app.post(
   checkIsAdmin,
   async function (request, response) {
     if (request.body.newPassword !== request.body.confirmPassword) {
-      response.redirect(`/adminsettings?message=Passwords do not match! Please try again.`);
+      response.redirect(
+        `/adminsettings?message=Passwords do not match! Please try again.`
+      );
     } else {
       //encryption for pass update
       const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
@@ -595,7 +708,9 @@ app.post(
         passwordHash: encrypted.toString("hex").toUpperCase(), //encryption
       });
 
-      response.redirect(`/adminsettings?message=Password successfully updated.`);
+      response.redirect(
+        `/adminsettings?message=Password successfully updated.`
+      );
     }
   }
 );
@@ -659,10 +774,9 @@ app.get("/logout", function (request, response) {
   const isAdmin = request.session.isAdmin;
   request.session.destroy(() => {
     if (isAdmin) {
-      response.redirect("/login-admin")
-    }
-    else {
-      response.redirect("/")
+      response.redirect("/login-admin");
+    } else {
+      response.redirect("/");
     }
   });
 });
@@ -683,7 +797,7 @@ app.post("/api/login", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-      encrypted.toString("hex").toUpperCase()
+        encrypted.toString("hex").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;
@@ -716,7 +830,7 @@ app.post("/api/login-admin", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-      encrypted.toString("hex").toUpperCase()
+        encrypted.toString("hex").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;

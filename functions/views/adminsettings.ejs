@@ -7,9 +7,10 @@
 /> -->
 
 <div class="container" style="margin-bottom: 15rem;">
+
   <% if (message) { %>
-  <h4><%= message %></h4>
-  <% } %>
+    <h5 class="color-adduOrange"><%= message %></h5>
+    <% } %>
 
   <h1 class="mt-5">
     <%- title %>
@@ -20,22 +21,22 @@
   
   <!-- Details -->
 
-  <form action="/updateAdminDetails" method="POST">
-    <input type="text" hidden name="id" value="<%= admins[0].id %>" />
+  <form id="adminForm" action="/updateAdminDetails" method="POST">
+    <input type="text" hidden name="id" value="<%= admin.id %>" />
 
     <div class="row">
       <div class="col-md-6">
         <div class="form-group">
           <label for="firstName"> First Name </label>
           <input type="text" class="form-control" id="firstName" name="firstName"
-            value="<%= admins[0].firstName %>" required/>
+            value="<%= admin.firstName %>" required/>
         </div>
       </div>
       <div class="col-md-6">
         <div class="form-group">
           <label for="lastName"> Last Name </label>
           <input type="text" class="form-control" id="lastName" name="lastName"
-            value="<%= admins[0].lastName %>" required />
+            value="<%= admin.lastName %>" required />
         </div>
       </div>
     </div>
@@ -45,7 +46,7 @@
         <div class="form-group">
           <label for="email"> Email </label>
           <input type="text" class="form-control" id="email" name="email"
-          value="<%= admins[0].email %>"
+          value="<%= admin.email %>"
             required
             />
         </div>
@@ -54,7 +55,7 @@
         <div class="form-group">
           <label for="contactNumber"> Contact Number </label>
           <input type="text" class="form-control" id="contactNumber" name="contactNumber"
-          value="<%= admins[0].contactNumber %>"
+          value="<%= admin.contactNumber %>"
             required
             />
         </div>
@@ -66,24 +67,209 @@
         <div class="form-group">
           <label for="address"> Address </label>
           <input type="text" class="form-control" id="address" name="address"
-          value="<%= admins[0].address %>"
+          value="<%= admin.address %>"
             required
-            />
+            />  
         </div>
       </div>
     </div>
-    
+
+    <!-- Change Password and Username  -->
+
+    <div class="row" style="margin-bottom: 5rem; margin-top: 2rem">
+      <div class="col-md-3">
+        <input type="button" style="width: 10rem" class="btn btn-primary-addu" value="Change Username" data-toggle="modal" data-target="#usernameModal"/>
+      </div>
+      <div class="col-md-3">
+        <input type="button" style="width: 10rem" class="btn btn-primary-addu" value="Change Password" data-toggle="modal" data-target="#passwordModal"/>
+      </div>
+    </div>
+ 
     <input type="submit" style="width: 10rem;" class="btn btn-orange-addu" value="Save" />
+
   </form>
 
+    <!-- MODAL -->
+    <div class="modal fade" id="usernameModal" tabindex="-1" role="dialog" aria-labelledby="changeUsernameModal" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <!-- content -->
+        <div class="modal-content">
+          <div class="modal-header">
+
+            <h5 class="modal-title" id="usernameForm">Change Username</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <form id="usernameForm" action="/updateAdminUsername" method="POST">
+            <input type="text" hidden name="id" value="<%= admin.id %>" />
+
+          <!-- BODY USERNAME CHANGE -->
+          <div class="modal-body">
+              <!-- username alert if wrong -->
+              <div id="usernameAlert" class="alert alert-danger d-none" role="alert">
+              </div>
+            <div class ="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="address"> Old Username </label>
+                  <input disabled type="text" class="form-control" id="address" name="address" value="<%= admin.username %>" required/>
+                </div>
+              </div>
+              <div class="col-md-12">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="newUsername"> New Username </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newUsername"
+                    name="newUsername"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="confirmUsername"> Confirm Username </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="confirmUsername"
+                    name="confirmUsername"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- END BODY -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModal" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <!-- content -->
+        <div class="modal-content">
+          <div class="modal-header">
+
+            <h5 class="modal-title" id="usernameForm">Change Password</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <form id="usernameForm" action="/updateAdminPassword" method="POST">
+            <input type="text" hidden name="id" value="<%= admin.id %>" />
+
+          <!-- BODY PASSWORD CHANGE -->
+          <div class="modal-body">
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="newUsername"> New Password </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newPassword"
+                    name="newPassword"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="confirmUsername"> Confirm Password </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- END BODY -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+
+        </div>
+      </div>
+    </div>
+
+  </form>
 </div>
 
 
-<!-- <script
-  defer
-  type="text/javascript"
-  charset="utf8"
-  src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"
-></script> -->
+<!-- SCRIPTS -->
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    (function ($) {
+
+      $("#usernameForm").on("submit", async function (event) {
+        event.preventDefault();
+
+        const newUsername = $("#newUsername").val();
+        const confirmUserName = $("#confirmUsername").val();
+
+        if (!newUsername) {
+          $("#usernameAlert")
+            .removeClass("d-none")
+            .text("Username cannot be empty.");
+        } else if (newUsername !== confirmUserName) {
+          $("#usernameAlert")
+            .removeClass("d-none")
+            .text("Usernames did not match.");
+        } else {
+          $(this).unbind();
+          $(this).submit();
+        }
+      });
+
+      $("#passwordForm").on("submit", async function (event) {
+        event.preventDefault();
+
+        const newPassword = $("#newPassword").val();
+        const confirmPassword = $("#confirmPassword").val();
+
+        if (!newPassword) {
+          $("#passwordAlert")
+            .removeClass("d-none")
+            .text("Password cannot be empty.");
+        } else if (newPassword !== confirmPassword) {
+          $("#passwordAlert")
+            .removeClass("d-none")
+            .text("Passwords did not match.");
+        } else {
+          $(this).unbind();
+          $(this).submit();
+        }
+
+        $("#newPassword").val("");
+        $("#confirmPassword").val("");
+      });
+    })(jQuery);
+  });
+</script>
+
 
 <%- include('./partials/_bottom') %>
