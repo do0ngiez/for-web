@@ -74,7 +74,23 @@
       </div>
     </div>
 
-    <!-- Change Password and Username  -->
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="address"> Username </label>
+          <input type="text" class="form-control" id="address" name="address"
+          value="<%= admin.username %>"
+            required disabled
+            />  
+        </div>
+      </div>
+      <div class="col-md-9" style="margin-bottom: 2rem; margin-top: 2rem">
+        <input type="button" class="btn btn-primary-addu" value="Change Username" data-toggle="modal" data-target="#usernameModal"/>
+        <input type="button" class="btn btn-primary-addu" value="Change Password" data-toggle="modal" data-target="#passwordModal"/>
+      </div>
+    </div>
+
+    <!-- Change Password and Username 
 
     <div class="row" style="margin-bottom: 5rem; margin-top: 2rem">
       <div class="col-md-3">
@@ -83,7 +99,7 @@
       <div class="col-md-3">
         <input type="button" style="width: 10rem" class="btn btn-primary-addu" value="Change Password" data-toggle="modal" data-target="#passwordModal"/>
       </div>
-    </div>
+    </div> -->
  
     <input type="submit" style="width: 10rem;" class="btn btn-orange-addu" value="Save" />
 
