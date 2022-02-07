@@ -12,13 +12,11 @@ firebase serve --only "functions,hosting"
 **admin side**
 - rest of details (gab), ui after everything is inputed(kriszha)
 - archive (gab)
-- ud, other deets (gab)
-- notifications
+- ud (gab)
+- notifications (gab)
 
 **general**
-- new collection for rssi, signal strength, time of contact, duration of contact, status
-    -- different collection from user.
-- logout of admin side if another (user) link is used (and vice versa)
+- multiple same username restriction (for app)
 
 **notes**
 - !! IMPT !! specify only 1 admin in document for defense

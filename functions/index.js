@@ -344,8 +344,12 @@ app.use(
     }),
     name: "__session",
     secret: "HZRJv39tRqf9tLsgGRjg", //random, encryption for sessions
-    resave: false,
-    saveUninitialized: true,
+    cookie: {
+      maxAge: 1000 * 60 * 5,//expires 5 minutes (login sessions),
+    },
+    resave: true,
+    rolling: true,
+    saveUninitialized: false,
   })
 );
 
@@ -760,14 +764,19 @@ app.post(
 
 //ADMIN LOGIN
 app.get("/login-admin", (request, response) => {
-  //gets to show the login-admin page
-  response.render("login-admin", {
-    title: "Admin Login",
-    pageName: "login-admin",
-    currentUser: request.session.user,
-    isAdmin: request.session.isAdmin,
-    message: request.query.message,
-  });
+  if (request.session.isAdmin) {
+    response.redirect("/"); //if manually typed, redirects to index page :)
+  }
+  else {
+    //gets to show the login-admin page
+    response.render("login-admin", {
+      title: "Admin Login",
+      pageName: "login-admin",
+      currentUser: request.session.user,
+      isAdmin: request.session.isAdmin,
+      message: request.query.message,
+    });
+  }
 });
 
 app.get("/logout", function (request, response) {
@@ -797,7 +806,7 @@ app.post("/api/login", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-        encrypted.toString("hex").toUpperCase()
+      encrypted.toString("hex").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;
@@ -830,7 +839,7 @@ app.post("/api/login-admin", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-        encrypted.toString("hex").toUpperCase()
+      encrypted.toString("hex").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;

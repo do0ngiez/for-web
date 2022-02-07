@@ -64,42 +64,45 @@
             </button> -->
                 <!-- <a href="/login" class="btn btn-outline-light my-2 my-sm-0" style="width: 120px;">SIGN IN</a> -->
                 <% } else { %>
-                    <div class="ml-auto">
-                        <ul class="navbar-nav">
-                            <span class="my-2 my-xs-0 pr-4" style="color: #08228d;">ADMIN MODE</span>
-                            <span class="color-adduOrange my-2 my-xs-0">Hi,</span>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="color-adduOrange">
-                                        <%= currentUser.firstName %>
-                                            <%= currentUser.lastName %>
-                                    </span> <!-- concat name!! :) -->
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="/adminsettings">User Settings</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="/logout" onclick="return confirmLogout()">
-                                        Logout
-                                        <img src="/open-iconic/svg/account-logout.svg" alt="account logout icon"
-                                            style="width: auto; height: 11px; margin-bottom: 2px;">
+                    <% if (isAdmin) { %>
+                        <div class="ml-auto">
+                            <ul class="navbar-nav">
+                                <span class="my-2 my-xs-0 pr-4" style="color: #08228d;">ADMIN MODE</span>
+                                <span class="color-adduOrange my-2 my-xs-0">Hi,</span>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="color-adduOrange">
+                                            <%= currentUser.firstName %>
+                                                <%= currentUser.lastName %>
+                                        </span> <!-- concat name!! :) -->
                                     </a>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <script type="text/javascript">
-                        function confirmLogout() {
-                            if (confirm("Are you sure you want to log out?")) {
-                                return true;
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="/adminsettings">User Settings</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="/logout" onclick="return confirmLogout()">
+                                            Logout
+                                            <img src="/open-iconic/svg/account-logout.svg" alt="account logout icon"
+                                                style="width: auto; height: 11px; margin-bottom: 2px;">
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+    
+                        <script type="text/javascript">
+                            function confirmLogout() {
+                                if (confirm("Are you sure you want to log out?")) {
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
                             }
-                            else {
-                                return false;
-                            }
-                        }
-                    </script>
+                        </script>
                     <% } %>
+                    
+                <% } %>
         </div>
     </nav>
 

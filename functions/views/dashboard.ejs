@@ -70,7 +70,9 @@
                     <%= user.lastName %>
                 </td>
                 <td>
+                  <% if (user.timeOfContact) { %>
                   <%= (new Date(user.timeOfContact._seconds * 1000)).toISOString().substring(0, 10) %>
+                  <% } %>
                 </td>
                 <td>
                   <%= user.status %>
