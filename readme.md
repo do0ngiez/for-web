@@ -2,7 +2,8 @@ npm i -g firebase-tools
 
 firebase serve --only "functions,hosting"
 
-to dos (for gab):
+**TO DOs:**
+
 **user side**
 - in monitoring form, when it is not yet the specific day, it should be read-only
 - "are you sure you want to save this?" in every save btn
@@ -15,8 +16,9 @@ to dos (for gab):
 - notifications
 
 **general**
- - new collection for rssi, signal strength, time of contact, duration of contact, status
-    -- different collection with user id.
+- new collection for rssi, signal strength, time of contact, duration of contact, status
+    -- different collection from user.
+- logout of admin side if another (user) link is used (and vice versa)
 
 **notes**
 - !! IMPT !! specify only 1 admin in document for defense
