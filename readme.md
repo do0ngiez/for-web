@@ -9,12 +9,16 @@ to dos (for gab):
 - "are you sure you want to save this?" in every save btn
 - if 'no symptoms' is checked, symptoms checkboxes should be read only (and vice versa)
 
-  **admin side**
+**admin side**
 
-- change ui for user setting
-- rest of details (gab)
+- rest of details (gab), ui after everything is inputed(kriszha)
 - archive (gab)
 - ud, other deets (gab)
+- notifications
+
+**general**
+ - new collection for rssi, signal strength, time of contact, duration of contact, status
+    -- different collection with user id.
 
 **notes**
 
