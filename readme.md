@@ -2,6 +2,8 @@ npm i -g firebase-tools
 
 firebase serve --only "functions,hosting"
 
+npm install --save firebase-functions@latest //don't use if not asked in terminal
+
 **TO DOs:**
 
 **user side**
