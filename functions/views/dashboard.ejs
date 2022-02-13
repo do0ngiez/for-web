@@ -18,12 +18,14 @@
           <%- title %>
         </h1>
         <p class="color-adduOrange">
-          Change or update the user details.
+          <b>Change or update the user details.</b>
+          <br>
+          * Use filter to seek specific users through their status or time of contact.
         </p>
 
         <div>
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label for="statusFilter">Status</label>
               <select class="form-control" name="status" id="statusFilter">
                 <option></option>
@@ -31,7 +33,7 @@
                 <option value="Negative">Negative</option>
               </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label for="fromDateFilter">Time of Contact</label>
               <div class="input-group input-daterange">
                 <input type="text" class="form-control" id="fromDateFilter" value="">
@@ -41,11 +43,10 @@
                 <input type="text" class="form-control" id="toDateFilter" value="">
               </div>
             </div>
+            <div class="col-md-3">
+              <button class="btn btn-orange-addu" style=" margin-top: 2rem" id="filterButton">Filter Data</button>
+            </div>
           </div>
-
-          <br />
-
-          <button class="btn btn-primary" id="filterButton">Filter</button>
         </div>
 
         <br />

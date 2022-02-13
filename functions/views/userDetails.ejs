@@ -1,35 +1,29 @@
 <%- include('./partials/_top_admin') %>
 
-<% if (selectedUser) { %>
-    <ul class="nav nav-tabs mt-4 pt-3" id="myTab" role="tablist">
+<div class="container mt-3">
+  <a href="/">
+      <a href="/">
+          <img src="/open-iconic/svg/chevron-left.svg" alt="left arrow icon" style="width: auto; height: 20px;">
+          Back to Dashboard</a>
+
+      <h1 class="mt-4">
+          View User Details
+      </h1>
+      <p class="color-adduOrange">
+          <b>View and edit user details.</b>
+          <br>
+          <b>View contact tracing and monitoring forms submitted by users.</b>
+      </p>
+  </div>
+
+<!-- user details area -->
+  <div class="container">
+    <% if (selectedUser) { %>
+    <ul class="nav nav-tabs mt-3 pt-3" id="myTab" role="tablist">
       <li class="nav-item p">
         <a class="nav-link active" id="userDetails-tab" data-toggle="tab" href="#userDetails" role="tab"
           aria-controls="userDetails" aria-selected="true">User Details</a>
       </li>
-      <!-- <li class="nav-item">
-<a
-  class="nav-link"
-  id="username-tab"
-  data-toggle="tab"
-  href="#username"
-  role="tab"
-  aria-controls="username"
-  aria-selected="false"
-  >Username</a
->
-</li>
-<li class="nav-item">
-<a
-  class="nav-link"
-  id="password-tab"
-  data-toggle="tab"
-  href="#password"
-  role="tab"
-  aria-controls="password"
-  aria-selected="false"
-  >Password</a
->
-</li> -->
     </ul>
 
     <!-- User Details Tab -->
@@ -80,31 +74,34 @@
             </div>
           </div>
 
-          <input type="submit" class="btn bg-adduOrange" value="   Save   " />
+          <input type="submit" class="btn btn-orange-addu" value="   Save   " />
         </form>
-
-        <% if (contactTracingForms) { %>
-            <div>
-            <h2>Contact Tracing Forms</h2>
-            <ul>
-              <% contactTracingForms.forEach(contactTracingForm => { %>
-                <li><a href="/userContactTracingFormDetails?id=<%= contactTracingForm.id %>"><%= (new Date(contactTracingForm.submissionDate._seconds * 1000)).toISOString().substring(0, 10) %></a></li>
-              <% }) %>
-            <ul>
-            </div>
-          <% } %>
-
-          <% if (monitoringForms) { %>
-            <div>
-            <h2>Self Monitoring Forms</h2>
-            <ul>
-              <% monitoringForms.forEach(monitoringForm => { %>
-                <li><a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>"><%= monitoringForm.dateStarted %></a></li>
-              <% }) %>
-            <ul>
-            </div>
-          <% } %>
       </div>
+    </div>
+    
+    <% if (contactTracingForms) { %>
+      <div>
+      <h2>Contact Tracing Forms</h2>
+      <ul>
+        <% contactTracingForms.forEach(contactTracingForm => { %>
+          <li><a href="/userContactTracingFormDetails?id=<%= contactTracingForm.id %>"><%= (new Date(contactTracingForm.submissionDate._seconds * 1000)).toISOString().substring(0, 10) %></a></li>
+        <% }) %>
+      <ul>
+      </div>
+    <% } %>
+
+    <% if (monitoringForms) { %>
+      <div>
+      <h2>Self Monitoring Forms</h2>
+      <ul>
+        <% monitoringForms.forEach(monitoringForm => { %>
+          <li><a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>"><%= monitoringForm.dateStarted %></a></li>
+        <% }) %>
+      <ul>
+      </div>
+    <% } %>
+    <!-- end tab -->
+  </div>
 <% } %>
 
 <%- include('./partials/_bottom') %>

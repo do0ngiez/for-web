@@ -257,6 +257,18 @@ async function createMSelfMonitoring(mId, collection) {
   });
 }
 
+async function deleteMSelfMonitoring(mId) {
+  const ref = firebase.firestore().collection("m-selfMonitoring");
+  await ref
+    .where("mId", "==", mId)
+    .get()
+    .then((snap) =>
+      snap.forEach(async (doc) => {
+        await ref.doc(doc.id).delete();
+      })
+    );
+}
+
 async function updateMonitoringForm(id, data) {
   const ref = firebaseApp.firestore().collection("monitoring-form");
   await ref.doc(id).update(data);
@@ -462,6 +474,12 @@ app.get("/monitoringForm", checkIsUser, async (request, response) => {
       ...currentMonitoringForm,
       selfMonitoring,
     };
+  } else {
+    currentMonitoringForm = {
+      selfMonitoring: [{
+        date: dayjs().format("MM/DD")
+      }]
+    };
   }
 
   response.render("monitoringForm", {
@@ -479,28 +497,32 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
     await updateMonitoringForm(request.body.mId, {
       dateStarted: request.body.dateStarted,
       dateSymptomsStarted: request.body.dateSymptomsStarted,
-      isComplete:
-        dayjs() >= dayjs(request.body.dateStarted).add(14, "day")
-          ? true
-          : false,
     });
-    request.body.selfMonitoring.forEach(async (selfMonitoring) => {
-      await updateMSelfMonitoring(selfMonitoring.id, {
-        date: selfMonitoring.date,
-        dailyTemperature: selfMonitoring.dailyTemperature,
-        noSymptoms: selfMonitoring.noSymptoms ? true : false,
-        cough: selfMonitoring.cough ? true : false,
-        cold: selfMonitoring.cold ? true : false,
-        diarrhea: selfMonitoring.diarrhea ? true : false,
-        soreThroat: selfMonitoring.soreThroat ? true : false,
-        headache: selfMonitoring.headache ? true : false,
-        fatigue: selfMonitoring.fatigue ? true : false,
-        difficultyOfBreathing: selfMonitoring.difficultyOfBreathing
-          ? true
-          : false,
-        others: selfMonitoring.others ? true : false,
-      });
-    });
+
+    // delete all existing selfmonitoring
+    await deleteMSelfMonitoring(request.body.mId);
+
+    // create new one
+    await createMSelfMonitoring(
+      request.body.mId,
+      request.body.selfMonitoring.map((selfMonitoring) => {
+        return {
+          date: selfMonitoring.date,
+          dailyTemperature: selfMonitoring.dailyTemperature,
+          noSymptoms: selfMonitoring.noSymptoms ? true : false,
+          cough: selfMonitoring.cough ? true : false,
+          cold: selfMonitoring.cold ? true : false,
+          diarrhea: selfMonitoring.diarrhea ? true : false,
+          soreThroat: selfMonitoring.soreThroat ? true : false,
+          headache: selfMonitoring.headache ? true : false,
+          fatigue: selfMonitoring.fatigue ? true : false,
+          difficultyOfBreathing: selfMonitoring.difficultyOfBreathing
+            ? true
+            : false,
+          others: selfMonitoring.others ? true : false,
+        };
+      })
+    );
   } else {
     const mId = await createMonitoringForm({
       dateStarted: request.body.dateStarted,
@@ -509,6 +531,43 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
     });
     await createMSelfMonitoring(
       mId,
+      request.body.selfMonitoring.map((selfMonitoring) => {
+        return {
+          date: selfMonitoring.date,
+          dailyTemperature: selfMonitoring.dailyTemperature,
+          noSymptoms: selfMonitoring.noSymptoms ? true : false,
+          cough: selfMonitoring.cough ? true : false,
+          cold: selfMonitoring.cold ? true : false,
+          diarrhea: selfMonitoring.diarrhea ? true : false,
+          soreThroat: selfMonitoring.soreThroat ? true : false,
+          headache: selfMonitoring.headache ? true : false,
+          fatigue: selfMonitoring.fatigue ? true : false,
+          difficultyOfBreathing: selfMonitoring.difficultyOfBreathing
+            ? true
+            : false,
+          others: selfMonitoring.others ? true : false,
+        };
+      })
+    );
+  }
+
+  response.redirect(`/?message=Monitoring Form successfully submitted.`);
+});
+
+app.post("/completeMonitoringForm", checkIsUser, async (request, response) => {
+  if (request.body.mId) {
+    await updateMonitoringForm(request.body.mId, {
+      dateStarted: request.body.dateStarted,
+      dateSymptomsStarted: request.body.dateSymptomsStarted,
+      isComplete: true
+    });
+    
+    // delete all existing selfmonitoring
+    await deleteMSelfMonitoring(request.body.mId);
+
+    // create new one
+    await createMSelfMonitoring(
+      request.body.mId,
       request.body.selfMonitoring.map((selfMonitoring) => {
         return {
           date: selfMonitoring.date,

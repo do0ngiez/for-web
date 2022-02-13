@@ -31,15 +31,15 @@
             MONITORING FORM
         </h1>
         <p class="color-adduOrange">
-            Daily self-monitoring form for a quarantined person. <br>
-            The form will be submitted after filling out 14 days of quarantine. <br>
+            <b>Daily self-monitoring form for a quarantined person.</b> Please fill it out everyday until the end of quarantine. <br>
+            The form will be submitted after filling out (n) days of quarantine. <br>
             The page will be refreshed after submission.
         </p>
     </div>
     
     <!-- USER DETAILS -->
 
-    <form action="/monitoringForm" method="POST">
+    <form action="" method="POST">
         <input type="hidden" name="mId" value="<%= currentMonitoringForm?.id %>">
 
         <div class="container">
@@ -78,12 +78,12 @@
     <!-- Self-Monitoring -->
             <table class="table table-bordered table-responsive">
                 <thead>
-                    <tr>
+                    <tr id="rowDate">
                         <th class="tableSticky">
                             Self-monitoring day
                         </th>
                         <!-- 14 days headers -->
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <th class="text-center" style="background-color: #f8f8f8;">
                                 <%= index + 1 %> 
                             </th>
@@ -91,30 +91,29 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr id="rowDate">
                         <td class="tableSticky">
                             Date (MM/DD)
                         </td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td>
-                                <input type="hidden" name="selfMonitoring[<%= index %>][id]" value="<%= currentMonitoringForm?.selfMonitoring[index]?.id %>">
                                 <input type="text" name="selfMonitoring[<%= index %>][date]" id="selfMonitoring[<%= index %>][date]" value="<%= currentMonitoringForm?.selfMonitoring[index]?.date %>" style="width: 4.25rem;" readonly>
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowDailyTemperature">
                         <td class="tableSticky">Daily Temperature*</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td>
                                 <input type="number" name="selfMonitoring[<%= index %>][dailyTemperature]" id="selfMonitoring[<%= index %>][dailyTemperature]" value="<%= currentMonitoringForm?.selfMonitoring[index]?.dailyTemperature %>" style="width: 4.25rem;">
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowNoSymptoms">
                         <td class="tableSticky">NO SYMPTOMS ✔</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][noSymptoms]" id="selfMonitoring[<%= index %>][noSymptoms]" <%= currentMonitoringForm?.selfMonitoring[index]?.noSymptoms ? 'checked' : '' %>>
                             </td>
@@ -125,72 +124,72 @@
                         <td colspan="15" class="tableSticky text-center">Pay attention to your health. If you develop any symptoms, check (✔) the box.</td>
                     </tr>
 
-                    <tr>
+                    <tr id="rowCough">
                         <td class="tableSticky">Cough</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][cough]" id="selfMonitoring[<%= index %>][cough]" <%= currentMonitoringForm?.selfMonitoring[index]?.cough ? 'checked' : '' %>>
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowCold">
                         <td class="tableSticky">Cold</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][cold]" id="selfMonitoring[<%= index %>][cold]" <%= currentMonitoringForm?.selfMonitoring[index]?.cold ? 'checked' : '' %>>
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowDiarrhea">
                         <td class="tableSticky">Diarrhea</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][diarrhea]" id="selfMonitoring[<%= index %>][diarrhea]" <%= currentMonitoringForm?.selfMonitoring[index]?.diarrhea ? 'checked' : '' %>>
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowSoreThroat">
                         <td class="tableSticky">Sore throat</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][soreThroat]" id="selfMonitoring[<%= index %>][soreThroat]" <%= currentMonitoringForm?.selfMonitoring[index]?.soreThroat ? 'checked' : '' %>>
                             </td>
                         <% } %>
                     </tr>
                     
-                    <tr>
+                    <tr id="rowHeadache">
                         <td class="tableSticky">Headache</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][headache]" id="selfMonitoring[<%= index %>][headache]" <%= currentMonitoringForm?.selfMonitoring[index]?.headache ? 'checked' : '' %>>
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowFatigue">
                         <td class="tableSticky">Fatigue</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][fatigue]" id="selfMonitoring[<%= index %>][fatigue]" <%= currentMonitoringForm?.selfMonitoring[index]?.fatigue ? 'checked' : '' %>>
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowDifficultyOfBreathing">
                         <td class="tableSticky">Difficulty of breathing</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][difficultyOfBreathing]" id="selfMonitoring[<%= index %>][difficultyOfBreathing]" <%= currentMonitoringForm?.selfMonitoring[index]?.difficultyOfBreathing ? 'checked' : '' %>>
                             </td>
                         <% } %>
                     </tr>
 
-                    <tr>
+                    <tr id="rowOthers">
                         <td class="tableSticky">Others: Loss of appetite, loss of taste/smell, body pain</td>
-                        <% for( let index = 0; index < 14; index++ ) { %>
+                        <% for( let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++ ) { %>
                             <td class="text-center">
                                 <input type="checkbox" name="selfMonitoring[<%= index %>][others]" id="selfMonitoring[<%= index %>][others]" <%= currentMonitoringForm?.selfMonitoring[index]?.others ? 'checked' : '' %>>
                             </td>
@@ -198,6 +197,9 @@
                     </tr>
                 </tbody>
             </table>
+
+            <button type="button" id="addDayButton">Add Day</button>
+
             <!-- Bottom Portion -->
             <div class="container mt-0">
                 <div class="row border-bottom border-left border-right p-2" style="background-color: #e6e6e6;">
@@ -222,7 +224,10 @@
                 </div>
             </div>
             <!-- Submit btn -->
-            <input type="submit" style="width: 10rem;" class="btn btn-orange-addu mt-2" value="Save">
+            <input type="button" id="saveButton" style="width: 10rem;" class="btn btn-orange-addu mt-2" value="Save">
+            <% if (currentMonitoringForm?.id) { %>
+                <input type="button" id="completeButton" style="width: 10rem;" class="btn btn-orange-addu mt-2" value="Complete">
+            <% } %>
         </div>
     </form>
     
@@ -240,10 +245,10 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
           if (!$('#dateStarted').val())
           {
             $('#dateStarted').val(dayjs().format('YYYY-MM-DD'));
-            for (let index = 0; index < 14; index++)
-            {
-                $(`#selfMonitoring\\[${index}\\]\\[date\\]`).val(dayjs().add(index, 'day').format('MM/DD'));
-            }
+            // for (let index = 0; index < currentMonitoringForm?.selfMonitoring?.length; index++)
+            // {
+            //     $(`#selfMonitoring\\[${index}\\]\\[date\\]`).val(dayjs().add(index, 'day').format('MM/DD'));
+            // }
           }
 
         $('.datepicker').datepicker({
@@ -251,6 +256,23 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
             startDate: '-14d',
             endDate: '0d'
         });
+
+        $('#saveButton').click(function () {
+            const form = $('form');
+            form.attr('action', '/monitoringForm');
+            form.submit();
+        })
+
+        $('#completeButton').click(function () {
+            const form = $('form');
+            form.attr('action', '/completeMonitoringForm');
+            form.submit();
+        })
+
+        $('#addDayButton').click(function () {
+            console.log('hi')
+            $('#rowDate').append(`<th class="text-center" style="background-color: #f8f8f8;">0</th>`)
+        })
     })(jQuery);
     });
   </script>
