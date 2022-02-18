@@ -76,13 +76,13 @@ async function getUsers(statusFilter, fromDateFilter, toDateFilter) {
   const ref = firebaseApp.firestore().collection("users");
   let query = ref;
   if (statusFilter) {
-    query = ref.where("status", "==", statusFilter);
+    query = query.where("status", "==", statusFilter);
   }
   if (fromDateFilter && toDateFilter) {
     const toDate = new Date(toDateFilter);
     toDate.setDate(toDate.getDate() + 1);
     toDate.setMilliseconds(toDate.getMilliseconds() - 1);
-    query = ref
+    query = query
       .where("timeOfContact", ">=", new Date(fromDateFilter))
       .where("timeOfContact", "<=", toDate);
   }
@@ -357,7 +357,7 @@ app.use(
     name: "__session",
     secret: "HZRJv39tRqf9tLsgGRjg", //random, encryption for sessions
     cookie: {
-      maxAge: 1000 * 60 * 5,//expires 5 minutes (login sessions),
+      maxAge: 1000 * 60 * 15,//expires 15 minutes (login sessions),
     },
     resave: true,
     rolling: true,
@@ -475,10 +475,16 @@ app.get("/monitoringForm", checkIsUser, async (request, response) => {
       selfMonitoring,
     };
   } else {
+    const dates = [];
+    for (let i = 0; i < 5; i++)
+    {
+      dates.push({
+        date: dayjs().add(i, 'day').format("MM/DD")
+      });
+    }
+    dates.push()
     currentMonitoringForm = {
-      selfMonitoring: [{
-        date: dayjs().format("MM/DD")
-      }]
+      selfMonitoring: dates
     };
   }
 

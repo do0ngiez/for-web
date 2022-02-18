@@ -1,107 +1,156 @@
 <%- include('./partials/_top_admin') %>
 
-<div class="container mt-3">
-  <a href="/">
-      <a href="/">
-          <img src="/open-iconic/svg/chevron-left.svg" alt="left arrow icon" style="width: auto; height: 20px;">
-          Back to Dashboard</a>
+  <div class="container mt-3">
+    <a href="/dashboard">
+      <a href="/dashboard">
+        <img src="/open-iconic/svg/chevron-left.svg" alt="left arrow icon" style="width: auto; height: 20px;">
+        Back to Dashboard</a>
 
       <h1 class="mt-4">
-          View User Details
+        View User Details
       </h1>
       <p class="color-adduOrange">
-          <b>View and edit user details.</b>
-          <br>
-          <b>View contact tracing and monitoring forms submitted by users.</b>
+        <b>View user details.</b>
+        <br>
+        <b>Edit user <i>status</i>.</b>
+        <br>
+        <b>View contact tracing and monitoring forms submitted by user.</b>
       </p>
   </div>
 
-<!-- user details area -->
+  <!-- TAB HEADERS -->
   <div class="container">
     <% if (selectedUser) { %>
-    <ul class="nav nav-tabs mt-3 pt-3" id="myTab" role="tablist">
-      <li class="nav-item p">
-        <a class="nav-link active" id="userDetails-tab" data-toggle="tab" href="#userDetails" role="tab"
-          aria-controls="userDetails" aria-selected="true">User Details</a>
-      </li>
-    </ul>
+      <ul class="nav nav-tabs mt-3 pt-3" id="myTab" role="tablist">
+        <li class="nav-item p">
+          <a class="nav-link active" id="userDetails-tab" data-toggle="tab" href="#userDetails" role="tab"
+            aria-controls="userDetails" aria-selected="true">User Details</a>
+        </li>
+        <li class="nav-item p">
+          <a class="nav-link" id="scan-tab" data-toggle="tab" href="#scanDetails" role="tab"
+            aria-controls="scanDetails" aria-selected="true">Bluetooth Scan Details</a>
+        </li>
+      </ul>
 
-    <!-- User Details Tab -->
-    <div class="tab-content border-left border-right border-bottom" id="myTabContent">
-      <div class="tab-pane fade show active p-4" id="userDetails" role="tabpanel"
-        aria-labelledby="userDetails-tab">
-        <!-- UPDATES DETAILS!!!!!!!!!!! -->
-        <form action="/updateUserDetails" method="POST">
-          <input type="text" hidden name="id" value="<%= selectedUser.id %>" />
+      <!-- User Details TAB -->
+      <div class="tab-content border-left border-right border-bottom">
+        <div class="tab-pane fade show active p-4" id="userDetails" role="tabpanel" aria-labelledby="userDetails-tab">
+          <!-- UPDATES DETAILS!!!!!!!!!!! -->
+          <form action="/updateUserDetails" method="POST">
+            <input type="text" hidden name="id" value="<%= selectedUser.id %>" />
 
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="firstName"> First Name </label>
+                  <input type="text" class="form-control" id="firstName" name="firstName"
+                    value="<%= selectedUser.firstName %>" readonly />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="lastName"> Last Name </label>
+                  <input type="text" class="form-control" id="lastName" name="lastName"
+                    value="<%= selectedUser.lastName %>" readonly />
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="Address"> Address </label>
+                  <input type="text" class="form-control" id="address" name="address"
+                    value="<%= selectedUser.address %>" readonly />
+                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phoneNumber"> Phone number </label>
+                  <input type="text" class="form-control" id="phoneNumber" name="phoneNumber"
+                    value="<%= selectedUser.phoneNumber %>" readonly />
+                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="Status"> Status </label>
+                  <select class="form-control" name="status" id="status" required>
+                    <option></option>
+                    <option value="Positive">Positive</option>
+                    <option value="Negative">Negative</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <input type="submit" class="btn btn-orange-addu" value="   Save   " />
+          </form>
+        </div>
+
+        <!-- Contacts Details TAB -->
+        <div class="tab-pane fade show p-4" id="scanDetails" role="tabpanel" aria-labelledby="scan-tab">
+          
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="firstName"> First Name </label>
-                <input type="text" class="form-control" id="firstName" name="firstName"
-                  value="<%= selectedUser.firstName %>" required />
+                <label for="timeOfContact"> Time of Contact </label>
+                <input type="text" class="form-control" id="timeOfContact" name="timeOfContact"
+                  value="<%= (new Date(selectedUser.timeOfContact._seconds * 1000)).toISOString().substring(0, 10) %>" readonly />
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="lastName"> Last Name </label>
                 <input type="text" class="form-control" id="lastName" name="lastName"
-                  value="<%= selectedUser.lastName %>" required />
+                  value="<%= selectedUser.lastName %>" readonly />
               </div>
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="Duration"> Duration (sec) </label>
-                <input type="number" class="form-control" id="duration" name="durationOfContact" <%# SHOULD MATCH
-                  WITH DATABASE!!!!!!!!! %>
-                value="<%= selectedUser.durationOfContact %>"
-                  required
-                  />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="Status"> Status </label>
-                <select class="form-control" name="status" id="status" required>
-                  <option></option>
-                  <option value="Positive">Positive</option>
-                  <option value="Negative">Negative</option>
-                </select>
-              </div>
-            </div>
-          </div>
+        </div>
+        
+      </div>
 
-          <input type="submit" class="btn btn-orange-addu" value="   Save   " />
-        </form>
-      </div>
-    </div>
-    
-    <% if (contactTracingForms) { %>
-      <div>
-      <h2>Contact Tracing Forms</h2>
-      <ul>
-        <% contactTracingForms.forEach(contactTracingForm => { %>
-          <li><a href="/userContactTracingFormDetails?id=<%= contactTracingForm.id %>"><%= (new Date(contactTracingForm.submissionDate._seconds * 1000)).toISOString().substring(0, 10) %></a></li>
-        <% }) %>
-      <ul>
-      </div>
-    <% } %>
+      <!-- FORMS PORTION -->
 
-    <% if (monitoringForms) { %>
-      <div>
-      <h2>Self Monitoring Forms</h2>
-      <ul>
-        <% monitoringForms.forEach(monitoringForm => { %>
-          <li><a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>"><%= monitoringForm.dateStarted %></a></li>
-        <% }) %>
-      <ul>
-      </div>
-    <% } %>
-    <!-- end tab -->
+      <% if (contactTracingForms) { %>
+        <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+          <h4>Contact Tracing Forms</h4>
+        </div>
+        <div class="container border pt-3 pl-4 pr-4 pb-4">
+          <!-- <h2>Contact Tracing Forms</h2> -->
+          <ul>
+            <% contactTracingForms.forEach(contactTracingForm=> { %>
+              <li><a href="/userContactTracingFormDetails?id=<%= contactTracingForm.id %>">
+                  <%= (new Date(contactTracingForm.submissionDate._seconds * 1000)).toISOString().substring(0, 10) %>
+                </a></li>
+              <% }) %>
+                <ul>
+        </div>
+        <% } %>
+
+          <% if (monitoringForms) { %>
+            <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+              <h4>Self Monitoring Forms</h4>
+            </div>
+            <div class="container border pt-3 pl-4 pr-4 pb-4">
+              <!-- <h2>Self Monitoring Forms</h2> -->
+              <ul>
+                <% monitoringForms.forEach(monitoringForm=> { %>
+                  <li><a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>">
+                      <%= monitoringForm.dateStarted %>
+                    </a></li>
+                  <% }) %>
+                    <ul>
+            </div>
+            <% } %>
+              <!-- end tab -->
   </div>
-<% } %>
+  <% } %>
 
-<%- include('./partials/_bottom') %>
+    <%- include('./partials/_bottom') %>

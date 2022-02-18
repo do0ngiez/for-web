@@ -1,6 +1,30 @@
 <%- include('./partials/_top_admin') %>
 
-<h2>User Contact Tracing Form Details</h2>
+<style>
+  .tableSticky {
+      position: sticky;
+      left: 0px;
+      background-color: #f3f3f3;
+      color: #423f3f;
+      font-weight: bold;
+  }
+</style>
+
+<div class="container mt-4">
+  <a href="/userDetails?id=<%= user.id %>">
+    <img src="/open-iconic/svg/chevron-left.svg" alt="left arrow icon" style="width: auto; height: 20px;">
+    Back to User
+  </a>
+
+      <h1 class="mt-4">
+        View contact tracing form
+      </h1>
+      <p class="color-adduOrange">
+        <b>
+          Contact tracing of patient and contacts & activities done list.
+        </b>
+      </p>
+</div>
 
  <!-- USER DETAILS -->
  <div class="container">
