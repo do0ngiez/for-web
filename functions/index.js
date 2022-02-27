@@ -6,6 +6,7 @@ const { FirestoreStore } = require("@google-cloud/connect-firestore"); //connect
 const engines = require("consolidate");
 const crypto = require("crypto");
 const dayjs = require("dayjs");
+const { get } = require("http");
 
 const algorithm = "aes-256-cbc"; //cypherblock thing
 const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE"; //random 32
@@ -121,7 +122,7 @@ async function getUserByUsername(username) {
   }
   return data;
 }
-
+//user part (user side)
 async function updateUser(id, data) {
   const ref = firebaseApp.firestore().collection("users");
   await ref.doc(id).update(data);
@@ -627,12 +628,14 @@ app.get("/userDetails", checkIsAdmin, async (request, response) => {
   let selectedUser = null;
   let contactTracingForms = null;
   let monitoringForms = null;
+  let positiveHistory = null;
   if (request.query.id) {
     selectedUser = await getUserById(request.query.id);
     contactTracingForms = await getAllContactTracingFormForUser(
       request.query.id
     );
     monitoringForms = await getAllMonitoringFormForUser(request.query.id);
+    positiveHistory = await getPositiveHistoryByUserId (request.query.id);
   }
   response.render("userDetails", {
     title: "User Details",
@@ -642,6 +645,7 @@ app.get("/userDetails", checkIsAdmin, async (request, response) => {
     selectedUser,
     contactTracingForms,
     monitoringForms,
+    positiveHistory,
   });
 });
 
@@ -816,16 +820,50 @@ app.post(
   "/updateUserDetails",
   checkIsAdmin,
   async function (request, response) {
-    await updateUser(request.body.id, {
-      firstName: request.body.firstName,
-      lastName: request.body.lastName,
-      durationOfContact: request.body.durationOfContact,
+    await updateUser(request.body.id, { //body.id is only for update???!!!
+      // firstName: request.body.firstName,
+      // lastName: request.body.lastName,
+      // durationOfContact: request.body.durationOfContact,
       status: request.body.status,
     });
-
+    if (request.body.status === "Positive") {
+      await createPositiveHistory({
+        userId: request.body.id,
+        firstName: request.body.firstName,
+        lastName: request.body.lastName,
+        timeStamp: new Date(),  
+      });
+    };
+    // await createPositiveHistory(request.body);
+    console.log(request.body.status);
     response.redirect(`/dashboard?message=Details successfully updated.`);
   }
 );
+
+//POSITIVE HISTORY CREATE
+async function createPositiveHistory(data) {
+  const ref = firebase.firestore().collection("positive-history");
+  const { id } = await ref.add(data);
+  return id;
+}
+
+//GET POS
+async function getPositiveHistoryByUserId(userId) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("positive-history");
+  await ref
+    .where("userId", "==", userId)
+    .get()
+    .then((snap) =>
+      snap.forEach((doc) => {
+        const entry = doc.data();
+        entry.id = doc.id;
+        data.push(entry);
+      })
+    );
+  return data;
+}
+
 
 //ADMIN LOGIN
 app.get("/login-admin", (request, response) => {

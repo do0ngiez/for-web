@@ -31,14 +31,11 @@
             MONITORING FORM
         </h1>
         <p class="color-adduOrange">
-            <b>Daily self-monitoring form for a quarantined person.</b> <b>(<i>Complete</i> button will show up once you save the page once.)</b>
+            <b>Daily self-monitoring form for a quarantined person.</b> <b>(<i>"Complete"</i> button will show up once you save the page once.)</b>
             <br>
-            Please fill it out everyday until the end of quarantine. 
+            Please fill it out everyday until the end of your (n) days of quarantine. 
             <br>
-            <br>
-            Please submit the form submitted after filling out (n) days of quarantine. 
-            <br>
-            The page will be refreshed after submission.
+            Click the  "<i>Complete</i>" button once done. (*Clicking the button will <b>refresh</b> the page)
         </p>
     </div>
     
@@ -77,8 +74,15 @@
             </div>
         </div>
         <div class="container">
-            <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+            <div class="bg-addu pt-1 pl-2 pr-2 pb-1">
                 <h4>Self-Monitoring List</h4>
+            </div>
+            <div class="container border pt-1 pl-1 pr-1 pb-1">
+                <p class="color-adduOrange">
+                    <i>*Add or remove day/s for quarantine
+                </p>
+                <button class="btn btn-orange-addu"type="button" id="addDayButton">[+] day</button>
+                <button class="btn btn-orange-addu" type="button" id="removeDayButton">[-] day</button>
             </div>
     <!-- Self-Monitoring -->
             <table class="table table-bordered table-responsive">
@@ -202,9 +206,6 @@
                     </tr>
                 </tbody>
             </table>
-
-            <button type="button" id="addDayButton">Add Day</button>
-            <button type="button" id="removeDayButton">Remove Last Day</button>
 
             <!-- Bottom Portion -->
             <div class="container mt-0">

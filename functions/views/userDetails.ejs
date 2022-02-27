@@ -15,6 +15,8 @@
         <b>Edit user <i>status</i>.</b>
         <br>
         <b>View contact tracing and monitoring forms submitted by user.</b>
+        <br>
+        <b>Save time stamp of <i>positive</i> status</b>
       </p>
   </div>
 
@@ -100,7 +102,7 @@
               <div class="form-group">
                 <label for="timeOfContact"> Time of Contact </label>
                 <input type="text" class="form-control" id="timeOfContact" name="timeOfContact"
-                  value="<%= (new Date(selectedUser.timeOfContact._seconds * 1000)).toISOString().substring(0, 10) %>" readonly />
+                  value="<%= new Date((new Date(selectedUser.timeOfContact._seconds * 1000)).getTime() - ((new Date(selectedUser.timeOfContact._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>" readonly />
               </div>
             </div>
             <div class="col-md-6">
@@ -116,6 +118,22 @@
         
       </div>
 
+      <!-- POSITIVE HISTORY -->
+
+      <div class="bg-addu pt-2 pl-2 pr-2 pb-1">
+        <h4>Positive History <span style="font-size: 14;">(yyyy-mm-dd)</span></h4> 
+      </div>
+      <div class="container border pt-3 pl-4 pr-4 pb-4">
+        <!-- <h2>Contact Tracing Forms</h2> -->
+        <ul>
+          <% positiveHistory.forEach( a => { %>
+            <li> 
+              <%= new Date((new Date(a.timeStamp._seconds * 1000)).getTime() - ((new Date(a.timeStamp._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %> 
+            </li>
+            <% }) %>
+              <ul>
+      </div>
+
       <!-- FORMS PORTION -->
 
       <% if (contactTracingForms) { %>
@@ -127,7 +145,7 @@
           <ul>
             <% contactTracingForms.forEach(contactTracingForm=> { %>
               <li><a href="/userContactTracingFormDetails?id=<%= contactTracingForm.id %>">
-                  <%= (new Date(contactTracingForm.submissionDate._seconds * 1000)).toISOString().substring(0, 10) %>
+                  <%= new Date((new Date(contactTracingForm.submissionDate._seconds * 1000)).getTime() - ((new Date(contactTracingForm.submissionDate._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>
                 </a></li>
               <% }) %>
                 <ul>
@@ -144,7 +162,11 @@
                 <% monitoringForms.forEach(monitoringForm=> { %>
                   <li><a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>">
                       <%= monitoringForm.dateStarted %>
-                    </a></li>
+                    </a>
+                    <% if (monitoringForm.isComplete) { %>
+                      <span style="color: rgb(77, 231, 77)"><i>status complete!</i></span>
+                    <% } %>
+                  </li>
                   <% }) %>
                     <ul>
             </div>
@@ -154,3 +176,9 @@
   <% } %>
 
     <%- include('./partials/_bottom') %>
+
+    <script>
+      $(document).ready(function() {
+        $("#status").val("<%= selectedUser.status %>")
+      });
+    </script>
