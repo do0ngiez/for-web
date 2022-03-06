@@ -21,3 +21,6 @@ npm install --save firebase-functions@latest //don't use if not asked in termina
 
 **notes**
 - !! IMPT !! specify only 1 admin in document for defense
+- archive is not positive logs
+- ?id -> request.query.id
+- calling &hello=hi

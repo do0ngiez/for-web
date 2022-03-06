@@ -8,11 +8,6 @@
 
 
   <div class="container">
-    <% if (message) { %>
-      <h5 class="mt-2 color-adduOrange">
-        <%= message %>
-      </h5>
-      <% } %>
 
         <h1 class="mt-4">
           <%- title %>
@@ -26,15 +21,7 @@
         <div>
           <div class="row">
             <div class="col-md-3">
-              <label for="statusFilter">Status</label>
-              <select class="form-control" name="status" id="statusFilter">
-                <option></option>
-                <option value="Positive">Positive</option>
-                <option value="Negative">Negative</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="fromDateFilter">Date of Contact</label>
+              <label for="fromDateFilter">Positive History Date</label>
               <div class="input-group input-daterange">
                 <input type="text" class="form-control" id="fromDateFilter" value="">
                 <div class="input-group-prepend input-group-append">
@@ -56,27 +43,22 @@
             <tr>
               <th class="d-none">Id</th>
               <th scope="col">Full Name</th>
-              <th scope="col">Date of Contact</th>
-              <th scope="col">Status</th>
+              <th scope="col">Date of History</th>
+              <!-- <th scope="col">Status</th> -->
             </tr>
           </thead>
           <tbody>
-            <% users.forEach(user=> { %>
+            <% positiveusers.forEach(positiveHistory=> { %>
               <tr>
                 <td class="d-none">
-                  <%= user.id %>
+                  <%= positiveHistory.id %>
                 </td>
                 <td>
-                  <%= user.firstName %>
-                    <%= user.lastName %>
+                  <%= positiveHistory.firstName %>
+                    <%= positiveHistory.lastName %>
                 </td>
                 <td>
-                  <% if (user.timeOfContact) { %>
-                  <%= new Date((new Date(user.timeOfContact._seconds * 1000)).getTime() - ((new Date(user.timeOfContact._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>
-                  <% } %>
-                </td>
-                <td>
-                  <%= user.status %>
+                  <%= new Date((new Date(positiveHistory.timeStamp._seconds * 1000)).getTime() - ((new Date(positiveHistory.timeStamp._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>
                 </td>
               </tr>
               <% }) %>
@@ -134,20 +116,18 @@
       (function ($) {
         const table = $("#myTable").DataTable();
 
-        $("#myTable tbody").on("click", "tr", function () {
-          const data = table.row(this).data();
-          window.location = `/userDetails?id=${data[0]}`;
-        });
+        // $("#myTable tbody").on("click", "tr", function () {
+        //   const data = table.row(this).data();
+        //   window.location = `/archived?id=${data[0]}`;
+        // });
 
         $('#filterButton').on('click', function () {
-          const statusFilter = $('#statusFilter').val();
           const fromDateFilter = $('#fromDateFilter').val();
           const toDateFilter = $('#toDateFilter').val();
-          window.location = `/dashboard?statusFilter=${statusFilter}&fromDateFilter=${fromDateFilter}&toDateFilter=${toDateFilter}`;
+          window.location = `/archived?fromDateFilter=${fromDateFilter}&toDateFilter=${toDateFilter}`;
         });
 
         const urlParams = new URLSearchParams(window.location.search);
-        $('#statusFilter').val(urlParams.get('statusFilter'));
         $('#fromDateFilter').val(urlParams.get('fromDateFilter'));
         $('#toDateFilter').val(urlParams.get('toDateFilter'));
 

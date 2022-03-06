@@ -367,7 +367,7 @@ app.use(
 );
 
 //Login Checker if User OR Admin
-
+//User can run only
 function checkIsUser(req, res, next) {
   if (req.session.user && !req.session.isAdmin) {
     next(); //If session exists, proceed to page
@@ -376,7 +376,7 @@ function checkIsUser(req, res, next) {
     next(err); //Error, trying to access unauthorized page!
   }
 }
-
+//Admin check, as in admin can only run
 function checkIsAdmin(req, res, next) {
   if (req.session.isAdmin) {
     next(); //If session exists, proceed to page
@@ -447,7 +447,7 @@ app.post("/contactTracingForm", checkIsUser, async (request, response) => {
   await createCtBeenAround(ctId, beenAround);
   await createCtActivity(ctId, activity);
 
-  response.redirect(`/?message=Contact Tracing Form successfully submitted.`);
+  response.redirect("/?message=Contact Tracing Form successfully submitted!");
 });
 
 //MONITORING FORM GET, POST
@@ -558,7 +558,7 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
     );
   }
 
-  response.redirect(`/?message=Monitoring Form successfully submitted.`);
+  response.redirect("/?message=Monitoring Form successfully submitted.");
 });
 
 app.post("/completeMonitoringForm", checkIsUser, async (request, response) => {
@@ -595,17 +595,46 @@ app.post("/completeMonitoringForm", checkIsUser, async (request, response) => {
     );
   }
 
-  response.redirect(`/?message=Monitoring Form successfully submitted.`);
+  response.redirect("/?message=Monitoring Form successfully submitted!");
 });
 
-app.get("/archived", checkIsAdmin, (request, response) => {
-  response.render("archived", {
-    title: "Archived Data",
+//archived -> positive logs 
+app.get("/archived", checkIsAdmin, async(request, response) => {
+  const positiveusers = await getPositiveLogs(
+    request.query.fromDateFilter,
+    request.query.toDateFilter
+  );
+
+  response.render("positiveLogs", {
+    title: "Positive Logs",
     pageName: "archived",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
+    positiveusers,
   });
 });
+
+async function getPositiveLogs(fromDateFilter, toDateFilter) {
+  let data = [];
+  const ref = firebaseApp.firestore().collection("positive-history");
+  let query = ref;
+  if (fromDateFilter && toDateFilter) {
+    const toDate = new Date(toDateFilter);
+    toDate.setDate(toDate.getDate() + 1);
+    toDate.setMilliseconds(toDate.getMilliseconds() - 1);
+    query = query
+      .where("timeStamp", ">=", new Date(fromDateFilter))
+      .where("timeStamp", "<=", toDate);
+  }
+  await query.get().then((snap) =>
+    snap.forEach((doc) => {
+      const entry = doc.data();
+      entry.id = doc.id;
+      data.push(entry);
+    })
+  );
+  return data;
+}
 
 app.get("/dashboard", checkIsAdmin, async (request, response) => {
   const users = await getUsers(
@@ -646,6 +675,7 @@ app.get("/userDetails", checkIsAdmin, async (request, response) => {
     contactTracingForms,
     monitoringForms,
     positiveHistory,
+    message: request.query.message,
   });
 });
 
@@ -739,7 +769,7 @@ app.post(
     request.session.user.firstName = request.body.firstName;
     request.session.user.lastName = request.body.lastName;
 
-    response.redirect(`/adminsettings?message=Details successfully updated.`);
+    response.redirect("/adminsettings?message=Details successfully updated!");
   }
 );
 
@@ -749,7 +779,7 @@ app.post(
   async function (request, response) {
     if (request.body.newUsername !== request.body.confirmUsername) {
       response.redirect(
-        `/adminsettings?message=Usernames do not match! Please try again.`
+        "/adminsettings?message=Usernames do not match! Please try again."
       );
     } else {
       await updateAdmin(request.body.id, {
@@ -757,7 +787,7 @@ app.post(
       });
 
       response.redirect(
-        `/adminsettings?message=Username successfully updated.`
+        "/adminsettings?message=Username successfully updated!"
       );
     }
   }
@@ -782,7 +812,7 @@ app.post(
       });
 
       response.redirect(
-        `/adminsettings?message=Password successfully updated.`
+        `/adminsettings?message=Password successfully updated!`
       );
     }
   }
@@ -812,7 +842,7 @@ app.post("/profile", checkIsUser, async function (request, response) {
   request.session.user.address = request.body.address;
   request.session.user.phoneNumber = request.body.phoneNumber;
 
-  response.redirect(`/profile?message=Profile successfully updated.`);
+  response.redirect(`/profile?message=Profile successfully updated!`);
 });
 
 ///USERS-ADMIN SIDE
@@ -836,7 +866,7 @@ app.post(
     };
     // await createPositiveHistory(request.body);
     console.log(request.body.status);
-    response.redirect(`/dashboard?message=Details successfully updated.`);
+    response.redirect(`/dashboard?message=Details successfully updated!`);
   }
 );
 
@@ -864,6 +894,20 @@ async function getPositiveHistoryByUserId(userId) {
   return data;
 }
 
+//delete pos history per user
+app.get("/deletePositiveHistory", checkIsAdmin, async (request, response) => {
+  await deletePositiveHistory(request.query.id);
+  await updateUser(request.query.uid, {
+    status: ""
+  });
+  response.redirect(`/userDetails?id=${request.query.uid}&message=Positive history has been deleted!`); //or "?id= + req."
+  //console.log();
+});
+
+async function deletePositiveHistory(id) {
+  const ref = firebase.firestore().collection("positive-history");
+  await ref.doc(id).delete();
+}
 
 //ADMIN LOGIN
 app.get("/login-admin", (request, response) => {
