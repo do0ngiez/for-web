@@ -34,10 +34,10 @@
           <a class="nav-link active" id="userDetails-tab" data-toggle="tab" href="#userDetails" role="tab"
             aria-controls="userDetails" aria-selected="true">User Details</a>
         </li>
-        <li class="nav-item p">
+        <!-- <li class="nav-item p">
           <a class="nav-link" id="scan-tab" data-toggle="tab" href="#scanDetails" role="tab"
             aria-controls="scanDetails" aria-selected="true">Bluetooth Scan Details</a>
-        </li>
+        </li> -->
         <li class="nav-item p">
           <a class="nav-link" id="closeContacts-tab" data-toggle="tab" href="#closeContacts" role="tab"
             aria-controls="closeContacts" aria-selected="true">Close Contacts</a>
@@ -90,12 +90,43 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
+                  <label for="Status"> Email </label>
+                  <input type="text" class="form-control" id="email" name="email"
+                    value="<%= selectedUser.email %>" readonly />
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phoneNumber"> Date Exposed </label>
+                  <input type="text" class="form-control" id="dateExposed" name="dateExposed"
+                  <% const myList = selectedUser.contacts[0].split(", ") %>
+                  <% const myList1 = myList[4].split(" ") %>
+                    value="<%= myList1[0] %>" readonly />
+                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
                   <label for="Status"> Status </label>
                   <select class="form-control" name="status" id="status" required>
                     <option></option>
                     <option value="Positive">Positive</option>
                     <option value="Negative">Negative</option>
                   </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phoneNumber"> Vaccination Status </label>
+                  <input type="text" class="form-control" id="vacStatus" name="vacStatus"
+                    value="<%= selectedUser.vacStatus %>" readonly />
+                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
                 </div>
               </div>
             </div>
@@ -145,11 +176,11 @@
                   value="<%= selectedUser.contacts %>" readonly />
               </div> -->
               <table id="myTable" class="table table-hover table-bordered">
-                <thead class="bg-addu">
+                <thead style = "background-color: #e6e6e6">
                   <tr>
-                    <!-- <th class="d-none">Id</th> -->
-                    <th scope="col">UUID</th>
-                    <th scope="col">RSSI Level</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone Number</th>
                     <th scope="col">Time of Contact</th>
                   </tr>
                 </thead>
@@ -165,6 +196,9 @@
                       </td>
                       <td>
                         <%= myList[2]%>
+                      </td>
+                      <td>
+                        <%= myList[4]%>
                       </td>
                     </tr>
                     <% }) %>
