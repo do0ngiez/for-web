@@ -52,20 +52,42 @@
             <input type="text" hidden name="id" value="<%= selectedUser.id %>" />
 
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="phoneNumber"> Date Exposed </label>
+                  <input type="text" class="form-control" id="dateExposed" name="dateExposed"
+                  <% const myList = selectedUser.contacts[0].split(", ") %>
+                  <% const myList1 = myList[4].split(" ") %>
+                    value="<%= myList1[0] %>" readonly />
+                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label for="firstName"> First Name </label>
                   <input type="text" class="form-control" id="firstName" name="firstName"
                     value="<%= selectedUser.firstName %>" readonly />
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
                   <label for="lastName"> Last Name </label>
                   <input type="text" class="form-control" id="lastName" name="lastName"
                     value="<%= selectedUser.lastName %>" readonly />
                 </div>
               </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="phoneNumber"> Vaccination Status </label>
+                  <input type="text" class="form-control" id="vacStatus" name="vacStatus"
+                    value="<%= selectedUser.vacStatus %>" readonly />
+                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
+                </div>
+              </div>
+
             </div>
 
             <div class="row">
@@ -80,7 +102,7 @@
             </div>
 
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-3">
                 <div class="form-group">
                   <label for="phoneNumber"> Phone number </label>
                   <input type="text" class="form-control" id="phoneNumber" name="phoneNumber"
@@ -88,27 +110,14 @@
                   <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-3">
                 <div class="form-group">
                   <label for="Status"> Email </label>
                   <input type="text" class="form-control" id="email" name="email"
                     value="<%= selectedUser.email %>" readonly />
                 </div>
               </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="phoneNumber"> Date Exposed </label>
-                  <input type="text" class="form-control" id="dateExposed" name="dateExposed"
-                  <% const myList = selectedUser.contacts[0].split(", ") %>
-                  <% const myList1 = myList[4].split(" ") %>
-                    value="<%= myList1[0] %>" readonly />
-                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
-                </div>
-              </div>
-              <div class="col-md-6">
+              <div class="col-md-3">
                 <div class="form-group">
                   <label for="Status"> Status </label>
                   <select class="form-control" name="status" id="status" required>
@@ -119,56 +128,14 @@
                 </div>
               </div>
             </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="phoneNumber"> Vaccination Status </label>
-                  <input type="text" class="form-control" id="vacStatus" name="vacStatus"
-                    value="<%= selectedUser.vacStatus %>" readonly />
-                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
-                </div>
-              </div>
-            </div>
-
-            <input type="submit" class="btn btn-orange-addu" value="   Save   " />
+            
+            <input type="submit" onclick="return savedetails()" class="btn btn-orange-addu" value="   Save   " />
+            
           </form>
         </div>
 
-        <!-- Contacts Details TAB -->
-        <div class="tab-pane fade show p-4" id="scanDetails" role="tabpanel" aria-labelledby="scan-tab">
-          
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="timeOfContact"> Time of Contact </label>
-                <input type="text" class="form-control" id="timeOfContact" name="timeOfContact"
-                  value="<%= new Date((new Date(selectedUser.timeOfContact._seconds * 1000)).getTime() - ((new Date(selectedUser.timeOfContact._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>" readonly />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="lastName"> Last Name </label>
-                <input type="text" class="form-control" id="lastName" name="lastName"
-                  value="<%= selectedUser.lastName %>" readonly />
-              </div>
-            </div>
-          </div>
-
-        </div>
-
         <div class="tab-pane fade show p-4" id="closeContacts" role="tabpanel" aria-labelledby="closeContacts-tab">
-          
-          <!-- <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="timeOfContact"> Time of Contact </label>
-                <input type="text" class="form-control" id="timeOfContact" name="timeOfContact"
-                  value="<%= new Date((new Date(selectedUser.timeOfContact._seconds * 1000)).getTime() - ((new Date(selectedUser.timeOfContact._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>" readonly />
-              </div>
-            </div>
-          </div> -->
-          <div class="class row">
+          <div class="row">
             <div class="col-md">
               <!-- <div class="form-group">
                 <label for="lastName"> Last Name </label>
@@ -208,7 +175,6 @@
           </div>
 
         </div>
-        
       </div>
 
       <!-- POSITIVE HISTORY -->
@@ -255,17 +221,36 @@
             </div>
             <div class="container border pt-3 pl-4 pr-4 pb-4">
               <!-- <h2>Self Monitoring Forms</h2> -->
-              <ul>
-                <% monitoringForms.forEach(monitoringForm=> { %>
-                  <li><a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>">
-                      <%= monitoringForm.dateStarted %>
-                    </a>
-                    <% if (monitoringForm.isComplete) { %>
-                      <span style="color: rgb(77, 231, 77); margin-left: 10px;"><i>status complete!</i></span>
-                    <% } %>
-                  </li>
+
+                <% monitoringForms.forEach((monitoringForm) => { %>
+                  <div style="border: 1px solid;">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <% if (monitoringForm.isComplete !== true) { %>
+                          <div class="form-group">
+                            <label for="numberOfDaysForQuarantine<%= monitoringForm.id %>">Number of Days for Quarantine</label>
+                            <input type="number" class="form-control" id="numberOfDaysForQuarantine<%= monitoringForm.id %>" name="numberOfDaysForQuarantine" value="<%= monitoringForm.numberOfDaysForQuarantine %>" min="5">
+                            <button type="button" class="mt-1 btn btn-orange-addu" onclick="saveNumberOfDaysForQuarantine('<%= monitoringForm.id %>')">Save</button>
+                          </div>
+
+                          <form method="post" action="/completeMonitoringForm">
+                            <input type="hidden" name="userId" value="<%= selectedUser.id %>" />
+                            <input type="hidden" name="mId" value="<%= monitoringForm.id %>" />
+                            <button type="submit" class="ml-2 btn btn-primary-addu" onclick="return clearbtn()"> Clear</button>
+                          </form>
+                          <% } %>
+                      </div>
+                    </div>
+                      <a href="/userMonitoringFormDetails?id=<%= monitoringForm.id %>">
+                        <%= monitoringForm.dateStarted %>
+                      </a>
+                      <% if (monitoringForm.isComplete) { %>
+                        <span style="color: rgb(77, 231, 77); margin-left: 10px;"><i>status complete!</i></span>
+                      <% } %>
+                  </div>
+
                   <% }) %>
-                    <ul>
+
             </div>
             <% } %>
               <!-- end tab -->
@@ -279,6 +264,15 @@
         $("#status").val("<%= selectedUser.status %>")
       });
 
+      function savedetails() {
+        if (confirm("Are you sure you want to save the status?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+      }
+
       function confirmDelete() {
         if (confirm("Are you sure you want to delete this?")) {
             return true;
@@ -286,5 +280,37 @@
         else {
             return false;
         }
-    }
+      }
+
+      function clearbtn() {
+        if (confirm("Clearing a user from quarantine refreshes their monitoring form. Are you sure you want to clear this user?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+      }
+
+      function saveNumberOfDaysForQuarantine(monitoringFormId) {
+        const numberOfDaysForQuarantine = $(`#numberOfDaysForQuarantine${monitoringFormId}`).val();
+        
+        const data = {
+          monitoringFormId,
+          numberOfDaysForQuarantine
+        }
+
+        fetch('/api/saveNumberOfDaysForQuarantine', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.statusCode === 204) {
+            alert('The monitoring form has been updated.')
+          }
+        })
+      }
     </script>

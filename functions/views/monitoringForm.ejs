@@ -31,11 +31,10 @@
             MONITORING FORM
         </h1>
         <p class="color-adduOrange">
-            <b>Daily self-monitoring form for a quarantined person.</b> <b>(<i>"Complete"</i> button will show up once you save the page once.)</b>
+            <b>Daily self-monitoring form for a quarantined person.</b>
             <br>
-            Please fill it out everyday until the end of your (n) days of quarantine. 
+            Please fill it out every single day until the end of your (n) days of quarantine. 
             <br>
-            Click the  "<i>Complete</i>" button once done. (*Clicking the button will <b>refresh</b> the page)
         </p>
     </div>
     
@@ -50,14 +49,28 @@
             </div>
             <div class="container border pt-3 pl-4 pr-4 pb-4">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="name">
                             Name
                         </label>
                         <input type="text" id="name" name="name" class="form-control" value="<%= currentUser.firstName %> <%= currentUser.lastName %>" readonly>
                     </div>
+                    <div class="col-md-4">
+                        <label for="name">
+                            <!-- for primary positive people only -->
+                            Date Positive
+                        </label>
+                        <input type="text" id="name" name="name" class="form-control" value="<%= positiveHistory.length ? new Date((new Date(positiveHistory[0].timeStamp._seconds * 1000)).getTime() - ((new Date(positiveHistory[0].timeStamp._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) : '' %>" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="name">
+                            <!-- for exposed people only -->
+                            Date Exposed 
+                        </label>
+                        <input type="text" id="name" name="name" class="form-control" value="<%= currentUser.firstName %> <%= currentUser.lastName %>" readonly>
+                    </div>
                 </div>
-                <div class="row">
+                <div class="row pt-2">
                     <div class="col-md-6">
                         <label for="dateStarted">
                             Date Started
@@ -77,13 +90,13 @@
             <div class="bg-addu pt-1 pl-2 pr-2 pb-1">
                 <h4>Self-Monitoring List</h4>
             </div>
-            <div class="container border pt-1 pl-1 pr-1 pb-1">
+            <!-- <div class="container border pt-1 pl-1 pr-1 pb-1">
                 <p class="color-adduOrange">
                     <i>*Add or remove day/s for quarantine
                 </p>
                 <button class="btn btn-orange-addu"type="button" id="addDayButton">[+] day</button>
                 <button class="btn btn-orange-addu" type="button" id="removeDayButton">[-] day</button>
-            </div>
+            </div> -->
     <!-- Self-Monitoring -->
             <table class="table table-bordered table-responsive">
                 <thead>
@@ -208,7 +221,7 @@
             </table>
 
             <!-- Bottom Portion -->
-            <div class="container mt-0">
+            <div class="container">
                 <div class="row border-bottom border-left border-right p-2" style="background-color: #e6e6e6;">
                     <div class="col-sm">
                         <p class="color-adduOrange text-center"><b>* Avoid the use of fever-reducing medicines (e.g., acetaminophen/Tylenol, ibuprofen/Advil) as much as possible. Fever-reducing medicines could hide early symptoms; if these must be taken, speak with your health care provider.</b></p>
@@ -232,9 +245,6 @@
             </div>
             <!-- Submit btn -->
             <input type="button" id="saveButton" style="width: 10rem;" class="btn btn-orange-addu mt-2" value="Save">
-            <% if (currentMonitoringForm?.id) { %>
-                <input type="button" id="completeButton" style="width: 10rem;" class="btn btn-orange-addu mt-2" value="Complete">
-            <% } %>
         </div>
     </form>
     
@@ -267,88 +277,88 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
             form.submit();
         })
 
-        $('#completeButton').click(function () {
-            const form = $('form');
-            form.attr('action', '/completeMonitoringForm');
-            form.submit();
-        })
+//         $('#completeButton').click(function () {
+//             const form = $('form');
+//             form.attr('action', '/completeMonitoringForm');
+//             form.submit();
+//         })
 
-        $('#addDayButton').click(function () {
-            const dayToAdd = $('#rowDateHeader').children().length;
-            $('#rowDateHeader').append(`<th class="text-center" style="background-color: #f8f8f8;">${dayToAdd}</th>`)
-            $('#rowDate').append(`
-<td>
-    <input type="text" name="selfMonitoring[${dayToAdd - 1}][date]" id="selfMonitoring[${dayToAdd - 1}][date]" value="${firstDay.add(dayToAdd - 1, 'day').format("MM/DD")}" style="width: 4.25rem;" readonly>
-</td>
-            `)
-            $('#rowDailyTemperature').append(`
-<td>
-    <input type="number" name="selfMonitoring[${dayToAdd - 1}][dailyTemperature]" id="selfMonitoring[${dayToAdd - 1}][dailyTemperature]" value="" style="width: 4.25rem;">
-</td>
-            `)
-            $('#rowNoSymptoms').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring${dayToAdd - 1}][noSymptoms]" id="selfMonitoring[${dayToAdd - 1}][noSymptoms]">
-</td>
-            `)
-            $('#rowCough').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][cough]" id="selfMonitoring[${dayToAdd - 1}][cough]">
-</td>
-            `)
-            $('#rowCold').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][cold]" id="selfMonitoring[${dayToAdd - 1}][cold]">
-</td>
-            `)
-            $('#rowDiarrhea').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][diarrhea]" id="selfMonitoring[${dayToAdd - 1}][diarrhea]">
-</td>
-            `)
-            $('#rowSoreThroat').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][soreThroat]" id="selfMonitoring[${dayToAdd - 1}][soreThroat]">
-</td>
-            `)
-            $('#rowHeadache').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][headache]" id="selfMonitoring[${dayToAdd - 1}][headache]">
-</td>
-            `)
-            $('#rowFatigue').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][fatigue]" id="selfMonitoring[${dayToAdd - 1}][fatigue]">
-</td>
-            `)
-            $('#rowDifficultyOfBreathing').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][difficultyOfBreathing]" id="selfMonitoring[${dayToAdd - 1}][difficultyOfBreathing]">
-</td>
-            `)
-            $('#rowOthers').append(`
-<td class="text-center">
-    <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][others]" id="selfMonitoring[${dayToAdd - 1}][others]">
-</td>
-            `)
-        })
+//         $('#addDayButton').click(function () {
+//             const dayToAdd = $('#rowDateHeader').children().length;
+//             $('#rowDateHeader').append(`<th class="text-center" style="background-color: #f8f8f8;">${dayToAdd}</th>`)
+//             $('#rowDate').append(`
+// <td>
+//     <input type="text" name="selfMonitoring[${dayToAdd - 1}][date]" id="selfMonitoring[${dayToAdd - 1}][date]" value="${firstDay.add(dayToAdd - 1, 'day').format("MM/DD")}" style="width: 4.25rem;" readonly>
+// </td>
+//             `)
+//             $('#rowDailyTemperature').append(`
+// <td>
+//     <input type="number" name="selfMonitoring[${dayToAdd - 1}][dailyTemperature]" id="selfMonitoring[${dayToAdd - 1}][dailyTemperature]" value="" style="width: 4.25rem;">
+// </td>
+//             `)
+//             $('#rowNoSymptoms').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring${dayToAdd - 1}][noSymptoms]" id="selfMonitoring[${dayToAdd - 1}][noSymptoms]">
+// </td>
+//             `)
+//             $('#rowCough').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][cough]" id="selfMonitoring[${dayToAdd - 1}][cough]">
+// </td>
+//             `)
+//             $('#rowCold').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][cold]" id="selfMonitoring[${dayToAdd - 1}][cold]">
+// </td>
+//             `)
+//             $('#rowDiarrhea').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][diarrhea]" id="selfMonitoring[${dayToAdd - 1}][diarrhea]">
+// </td>
+//             `)
+//             $('#rowSoreThroat').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][soreThroat]" id="selfMonitoring[${dayToAdd - 1}][soreThroat]">
+// </td>
+//             `)
+//             $('#rowHeadache').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][headache]" id="selfMonitoring[${dayToAdd - 1}][headache]">
+// </td>
+//             `)
+//             $('#rowFatigue').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][fatigue]" id="selfMonitoring[${dayToAdd - 1}][fatigue]">
+// </td>
+//             `)
+//             $('#rowDifficultyOfBreathing').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][difficultyOfBreathing]" id="selfMonitoring[${dayToAdd - 1}][difficultyOfBreathing]">
+// </td>
+//             `)
+//             $('#rowOthers').append(`
+// <td class="text-center">
+//     <input type="checkbox" name="selfMonitoring[${dayToAdd - 1}][others]" id="selfMonitoring[${dayToAdd - 1}][others]">
+// </td>
+//             `)
+//         })
 
-        $('#removeDayButton').click(function() {
-            if ($('#rowDateHeader').children().length > 1) {
-                $('#rowDateHeader').children().last().remove();
-                $('#rowDate').children().last().remove();
-                $('#rowDailyTemperature').children().last().remove();
-                $('#rowNoSymptoms').children().last().remove();
-                $('#rowCough').children().last().remove();
-                $('#rowCold').children().last().remove();
-                $('#rowDiarrhea').children().last().remove();
-                $('#rowSoreThroat').children().last().remove();
-                $('#rowHeadache').children().last().remove();
-                $('#rowFatigue').children().last().remove();
-                $('#rowDifficultyOfBreathing').children().last().remove();
-                $('#rowOthers').children().last().remove();
-            }
-        })
+//         $('#removeDayButton').click(function() {
+//             if ($('#rowDateHeader').children().length > 1) {
+//                 $('#rowDateHeader').children().last().remove();
+//                 $('#rowDate').children().last().remove();
+//                 $('#rowDailyTemperature').children().last().remove();
+//                 $('#rowNoSymptoms').children().last().remove();
+//                 $('#rowCough').children().last().remove();
+//                 $('#rowCold').children().last().remove();
+//                 $('#rowDiarrhea').children().last().remove();
+//                 $('#rowSoreThroat').children().last().remove();
+//                 $('#rowHeadache').children().last().remove();
+//                 $('#rowFatigue').children().last().remove();
+//                 $('#rowDifficultyOfBreathing').children().last().remove();
+//                 $('#rowOthers').children().last().remove();
+//             }
+//         })
     })(jQuery);
     });
   </script>

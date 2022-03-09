@@ -58,6 +58,7 @@
               <th scope="col">Full Name</th>
               <th scope="col">Date of Contact</th>
               <th scope="col">Status</th>
+              <th scope="col">Vaccination Status</th>
             </tr>
           </thead>
           <tbody>
@@ -77,6 +78,9 @@
                 </td>
                 <td>
                   <%= user.status %>
+                </td>
+                <td>
+                  <%= user.vacStatus %>
                 </td>
               </tr>
               <% }) %>

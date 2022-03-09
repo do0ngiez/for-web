@@ -248,7 +248,12 @@ async function createMonitoringForm(data) {
   return id;
 }
 
-async function createMSelfMonitoring(mId, collection) {
+async function createMSelfMonitoring(data) {
+  const ref = firebase.firestore().collection("m-selfMonitoring");
+  await ref.add(data);
+}
+
+async function createManyMSelfMonitoring(mId, collection) {
   const ref = firebase.firestore().collection("m-selfMonitoring");
   collection.forEach(async (data) => {
     await ref.add({
@@ -258,7 +263,7 @@ async function createMSelfMonitoring(mId, collection) {
   });
 }
 
-async function deleteMSelfMonitoring(mId) {
+async function deleteMSelfMonitoringForMonitoringForm(mId) {
   const ref = firebase.firestore().collection("m-selfMonitoring");
   await ref
     .where("mId", "==", mId)
@@ -268,6 +273,11 @@ async function deleteMSelfMonitoring(mId) {
         await ref.doc(doc.id).delete();
       })
     );
+}
+
+async function deleteMSelfMonitoring(id) {
+  const ref = firebase.firestore().collection("m-selfMonitoring");
+  await ref.doc(id).delete();
 }
 
 async function updateMonitoringForm(id, data) {
@@ -452,6 +462,13 @@ app.post("/contactTracingForm", checkIsUser, async (request, response) => {
 
 //MONITORING FORM GET, POST
 app.get("/monitoringForm", checkIsUser, async (request, response) => {
+  const positiveHistory = await getPositiveHistoryByUserId (
+    request.session.user.id
+  )
+  // sort by descending
+  positiveHistory.sort((a, b) =>
+    dayjs(a.timeStamp) < dayjs(b.timeStamp) ? 1 : -1
+  );
   let allMonitoringForm = await getAllMonitoringFormForUser(
     request.session.user.id
   );
@@ -496,6 +513,7 @@ app.get("/monitoringForm", checkIsUser, async (request, response) => {
     isAdmin: request.session.isAdmin,
     message: request.query.message,
     currentMonitoringForm,
+    positiveHistory
   });
 });
 
@@ -507,10 +525,10 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
     });
 
     // delete all existing selfmonitoring
-    await deleteMSelfMonitoring(request.body.mId);
+    await deleteMSelfMonitoringForMonitoringForm(request.body.mId);
 
     // create new one
-    await createMSelfMonitoring(
+    await createManyMSelfMonitoring(
       request.body.mId,
       request.body.selfMonitoring.map((selfMonitoring) => {
         return {
@@ -535,8 +553,9 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
       dateStarted: request.body.dateStarted,
       dateSymptomsStarted: request.body.dateSymptomsStarted,
       userId: request.session.user.id,
+      numberOfDaysForQuarantine: 5
     });
-    await createMSelfMonitoring(
+    await createManyMSelfMonitoring(
       mId,
       request.body.selfMonitoring.map((selfMonitoring) => {
         return {
@@ -561,41 +580,41 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
   response.redirect("/?message=Monitoring Form successfully submitted.");
 });
 
-app.post("/completeMonitoringForm", checkIsUser, async (request, response) => {
+app.post("/completeMonitoringForm", checkIsAdmin, async (request, response) => {
   if (request.body.mId) {
     await updateMonitoringForm(request.body.mId, {
-      dateStarted: request.body.dateStarted,
-      dateSymptomsStarted: request.body.dateSymptomsStarted,
+      // dateStarted: request.body.dateStarted,
+      // dateSymptomsStarted: request.body.dateSymptomsStarted,
       isComplete: true
     });
     
-    // delete all existing selfmonitoring
-    await deleteMSelfMonitoring(request.body.mId);
+  //   // delete all existing selfmonitoring
+  //   await deleteMSelfMonitoringForMonitoringForm(request.body.mId);
 
-    // create new one
-    await createMSelfMonitoring(
-      request.body.mId,
-      request.body.selfMonitoring.map((selfMonitoring) => {
-        return {
-          date: selfMonitoring.date,
-          dailyTemperature: selfMonitoring.dailyTemperature,
-          noSymptoms: selfMonitoring.noSymptoms ? true : false,
-          cough: selfMonitoring.cough ? true : false,
-          cold: selfMonitoring.cold ? true : false,
-          diarrhea: selfMonitoring.diarrhea ? true : false,
-          soreThroat: selfMonitoring.soreThroat ? true : false,
-          headache: selfMonitoring.headache ? true : false,
-          fatigue: selfMonitoring.fatigue ? true : false,
-          difficultyOfBreathing: selfMonitoring.difficultyOfBreathing
-            ? true
-            : false,
-          others: selfMonitoring.others ? true : false,
-        };
-      })
-    );
+  //   // create new one
+  //   await createManyMSelfMonitoring(
+  //     request.body.mId,
+  //     request.body.selfMonitoring.map((selfMonitoring) => {
+  //       return {
+  //         date: selfMonitoring.date,
+  //         dailyTemperature: selfMonitoring.dailyTemperature,
+  //         noSymptoms: selfMonitoring.noSymptoms ? true : false,
+  //         cough: selfMonitoring.cough ? true : false,
+  //         cold: selfMonitoring.cold ? true : false,
+  //         diarrhea: selfMonitoring.diarrhea ? true : false,
+  //         soreThroat: selfMonitoring.soreThroat ? true : false,
+  //         headache: selfMonitoring.headache ? true : false,
+  //         fatigue: selfMonitoring.fatigue ? true : false,
+  //         difficultyOfBreathing: selfMonitoring.difficultyOfBreathing
+  //           ? true
+  //           : false,
+  //         others: selfMonitoring.others ? true : false,
+  //       };
+  //     })
+  //   );
   }
 
-  response.redirect("/?message=Monitoring Form successfully submitted!");
+  response.redirect(`/userDetails?id=${request.body.userId}`);
 });
 
 //archived -> positive logs 
@@ -678,6 +697,49 @@ app.get("/userDetails", checkIsAdmin, async (request, response) => {
     message: request.query.message,
   });
 });
+
+app.put("/api/saveNumberOfDaysForQuarantine", checkIsAdmin, async (request, response) => {
+  const numberOfDaysForQuarantine = Number(request.body.numberOfDaysForQuarantine);
+  await updateMonitoringForm(request.body.monitoringFormId, {
+    numberOfDaysForQuarantine: numberOfDaysForQuarantine
+  })
+
+  const selfMonitorings = await getAllMSelfMonitoringForMonitoringForm(request.body.monitoringFormId);
+  selfMonitorings.sort((a, b) =>
+    dayjs(a.date, "MM/DD") > dayjs(b.date, "MM/DD") ? 1 : -1
+  );
+  const monitoringForm = await getMonitoringFormById(request.body.monitoringFormId);
+
+  let count = selfMonitorings.length;
+
+  // create
+  while (count < numberOfDaysForQuarantine) {
+    await createMSelfMonitoring({
+      mId: request.body.monitoringFormId,
+      date: dayjs(monitoringForm.dateStarted).add(count, 'day').format("MM/DD"),
+      dailyTemperature: '',
+      noSymptoms: false,
+      cough: false,
+      cold: false,
+      diarrhea: false,
+      soreThroat: false,
+      headache: false,
+      fatigue: false,
+      difficultyOfBreathing: false,
+      others: false,
+    })
+    count++;
+  }
+
+  // delete
+  while (count > numberOfDaysForQuarantine) {
+    const lastSelfMonitoring = selfMonitorings.pop();
+    await deleteMSelfMonitoring(lastSelfMonitoring.id);
+    count--;
+  }
+
+  response.json({status: 'ok', statusCode: 204});
+})
 
 app.get(
   "/userContactTracingFormDetails",
@@ -808,7 +870,7 @@ app.post(
       encrypted = Buffer.concat([encrypted, cipher.final()]);
 
       await updateAdmin(request.body.id, {
-        passwordHash: encrypted.toString("hex").toUpperCase(), //encryption
+        passwordHash: encrypted.toString("base64").toUpperCase(), //encryption
       });
 
       response.redirect(
@@ -953,7 +1015,7 @@ app.post("/api/login", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-      encrypted.toString("hex").toUpperCase()
+      encrypted.toString("base64").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;
@@ -986,7 +1048,7 @@ app.post("/api/login-admin", async function (request, response) {
     if (
       user &&
       user.passwordHash.toUpperCase() ===
-      encrypted.toString("hex").toUpperCase()
+      encrypted.toString("base64").toUpperCase()
       //hexadecimal
     ) {
       request.session.user = user;
