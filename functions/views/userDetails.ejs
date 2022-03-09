@@ -129,7 +129,7 @@
               </div>
             </div>
             
-            <input type="submit" onclick="savedetails()" class="btn btn-orange-addu" value="   Save   " />
+            <input type="submit" onclick="return savedetails()" class="btn btn-orange-addu" value="   Save   " />
             
           </form>
         </div>
@@ -189,7 +189,7 @@
             <li> 
               <%= new Date((new Date(a.timeStamp._seconds * 1000)).getTime() - ((new Date(a.timeStamp._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %> 
               <a href="/deletePositiveHistory?id=<%= a.id %>&uid=<%= a.userId %> ">
-                <img src="/open-iconic/svg/trash.svg" alt="trash icon" onclick="confirmDelete()"
+                <img src="/open-iconic/svg/trash.svg" alt="trash icon" onclick="return confirmDelete()"
                 style="filter: invert(15%) sepia(84%) saturate(6022%) hue-rotate(357deg) brightness(99%) contrast(116%);width: auto; height: 12px; margin-left: 10px; margin-bottom: 4px;">
               </a>
             </li>
@@ -236,7 +236,7 @@
                           <form method="post" action="/completeMonitoringForm">
                             <input type="hidden" name="userId" value="<%= selectedUser.id %>" />
                             <input type="hidden" name="mId" value="<%= monitoringForm.id %>" />
-                            <button type="submit" class="ml-2 btn btn-primary-addu" onclick="clearbtn()"> Clear</button>
+                            <button type="submit" class="ml-2 btn btn-primary-addu" onclick="return clearbtn()"> Clear</button>
                           </form>
                           <% } %>
                       </div>
