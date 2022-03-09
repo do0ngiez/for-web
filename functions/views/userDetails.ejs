@@ -38,6 +38,10 @@
           <a class="nav-link" id="scan-tab" data-toggle="tab" href="#scanDetails" role="tab"
             aria-controls="scanDetails" aria-selected="true">Bluetooth Scan Details</a>
         </li>
+        <li class="nav-item p">
+          <a class="nav-link" id="closeContacts-tab" data-toggle="tab" href="#closeContacts" role="tab"
+            aria-controls="closeContacts" aria-selected="true">Close Contacts</a>
+        </li>
       </ul>
 
       <!-- User Details TAB -->
@@ -117,6 +121,55 @@
                 <input type="text" class="form-control" id="lastName" name="lastName"
                   value="<%= selectedUser.lastName %>" readonly />
               </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="tab-pane fade show p-4" id="closeContacts" role="tabpanel" aria-labelledby="closeContacts-tab">
+          
+          <!-- <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="timeOfContact"> Time of Contact </label>
+                <input type="text" class="form-control" id="timeOfContact" name="timeOfContact"
+                  value="<%= new Date((new Date(selectedUser.timeOfContact._seconds * 1000)).getTime() - ((new Date(selectedUser.timeOfContact._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>" readonly />
+              </div>
+            </div>
+          </div> -->
+          <div class="class row">
+            <div class="col-md">
+              <!-- <div class="form-group">
+                <label for="lastName"> Last Name </label>
+                <input type="text" class="form-control" id="lastName" name="lastName"
+                  value="<%= selectedUser.contacts %>" readonly />
+              </div> -->
+              <table id="myTable" class="table table-hover table-bordered">
+                <thead class="bg-addu">
+                  <tr>
+                    <!-- <th class="d-none">Id</th> -->
+                    <th scope="col">UUID</th>
+                    <th scope="col">RSSI Level</th>
+                    <th scope="col">Time of Contact</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% selectedUser.contacts.forEach(contact=> { %>
+                  <% const myList = contact.split(",") %>
+                    <tr>
+                      <td>
+                        <%= myList[0]%>
+                      </td>
+                      <td>
+                        <%= myList[1]%>
+                      </td>
+                      <td>
+                        <%= myList[2]%>
+                      </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+              </table>
             </div>
           </div>
 
