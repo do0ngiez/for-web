@@ -102,10 +102,13 @@
                 <div class="form-group">
                   <label for="phoneNumber"> Date Exposed </label>
                   <input type="text" class="form-control" id="dateExposed" name="dateExposed"
-                  <% const myList = selectedUser.contacts[0].split(", ") %>
-                  <% const myList1 = myList[4].split(" ") %>
-                    value="<%= myList1[0] %>" readonly />
-                  <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
+                  <% if (selectedUser.contacts.length > 0) { %>
+                    <% const myList = selectedUser.contacts[0].split(", ") %>
+                    <% const myList1 = myList[4].split(" ") %>
+                      value="<%= myList1[0] %>" readonly />
+                  <% } else { %>
+                      value="" readonly />
+                  <% } %>
                 </div>
               </div>
               <div class="col-md-6">
