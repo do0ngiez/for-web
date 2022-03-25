@@ -40,7 +40,8 @@
     
     <!-- USER DETAILS -->
 
-    <form action="" method="POST">
+    <form action="/monitoringForm" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="hidden" name="mId" value="<%= currentMonitoringForm?.id %>">
 
         <div class="container">
@@ -244,7 +245,7 @@
                 </div>
             </div>
             <!-- Submit btn -->
-            <input type="button" id="saveButton" style="width: 10rem;" class="btn btn-orange-addu mt-2" value="Save">
+            <input type="submit" id="saveButton" style="width: 10rem;" class="btn btn-orange-addu mt-2" value="Save">
         </div>
     </form>
     
@@ -271,11 +272,11 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
             endDate: '0d'
         });
 
-        $('#saveButton').click(function () {
-            const form = $('form');
-            form.attr('action', '/monitoringForm');
-            form.submit();
-        })
+        // $('#saveButton').click(function () {
+        //     const form = $('form');
+        //     form.attr('action', '/monitoringForm');
+        //     form.submit();
+        // })
 
 //         $('#completeButton').click(function () {
 //             const form = $('form');

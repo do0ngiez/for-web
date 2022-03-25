@@ -6,11 +6,13 @@ const { FirestoreStore } = require("@google-cloud/connect-firestore"); //connect
 const engines = require("consolidate");
 const crypto = require("crypto");
 const dayjs = require("dayjs");
-const { get } = require("http");
+const csrf = require('csurf');
 
 const algorithm = "aes-256-cbc"; //cypherblock thing
 const key = "nDCZhi1XfcGsfNkqnSwSKVekovz3IUDE"; //random 32
 const iv = "9ONZu9SfCNbW5ffk"; //initialization vector -- still for encryption
+
+const csrfProtection = csrf({cookie: false});
 
 // firebase
 const firebaseConfig = {
@@ -397,7 +399,7 @@ function checkIsAdmin(req, res, next) {
 }
 
 // PAGES AREA
-app.get("/", (request, response) => {
+app.get("/", csrfProtection, (request, response) => {
   //gets the index after logging in (ADMIN SIDE)
   if (request.session.isAdmin) {
     response.render("index", {
@@ -424,22 +426,24 @@ app.get("/", (request, response) => {
       currentUser: request.session.user,
       isAdmin: request.session.isAdmin,
       message: request.query.message,
+      csrfToken: request.csrfToken()
     });
   }
 });
 
 //CT FORM GET, POST
-app.get("/contactTracingForm", checkIsUser, (request, response) => {
+app.get("/contactTracingForm", checkIsUser, csrfProtection, (request, response) => {
   response.render("contactTracingForm", {
     title: "Contact Tracing Form",
     pageName: "contactTracingForm",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     message: request.query.message,
+    csrfToken: request.csrfToken()
   });
 });
 
-app.post("/contactTracingForm", checkIsUser, async (request, response) => {
+app.post("/contactTracingForm", checkIsUser, csrfProtection, async (request, response) => {
   const livesWith = request.body.livesWith.filter(
     (p) => p.firstName != "REMOVED"
   );
@@ -461,7 +465,7 @@ app.post("/contactTracingForm", checkIsUser, async (request, response) => {
 });
 
 //MONITORING FORM GET, POST
-app.get("/monitoringForm", checkIsUser, async (request, response) => {
+app.get("/monitoringForm", checkIsUser, csrfProtection, async (request, response) => {
   const positiveHistory = await getPositiveHistoryByUserId (
     request.session.user.id
   )
@@ -513,15 +517,16 @@ app.get("/monitoringForm", checkIsUser, async (request, response) => {
     isAdmin: request.session.isAdmin,
     message: request.query.message,
     currentMonitoringForm,
-    positiveHistory
+    positiveHistory,
+    csrfToken: request.csrfToken()
   });
 });
 
-app.post("/monitoringForm", checkIsUser, async (request, response) => {
+app.post("/monitoringForm", checkIsUser, csrfProtection, async (request, response) => {
   if (request.body.mId) {
     await updateMonitoringForm(request.body.mId, {
       dateStarted: request.body.dateStarted,
-      dateSymptomsStarted: request.body.dateSymptomsStarted,
+      dateSymptomsStarted: request.body.dateSymptomsStarted
     });
 
     // delete all existing selfmonitoring
@@ -580,7 +585,7 @@ app.post("/monitoringForm", checkIsUser, async (request, response) => {
   response.redirect("/?message=Monitoring Form successfully submitted.");
 });
 
-app.post("/completeMonitoringForm", checkIsAdmin, async (request, response) => {
+app.post("/completeMonitoringForm", checkIsAdmin, csrfProtection, async (request, response) => {
   if (request.body.mId) {
     await updateMonitoringForm(request.body.mId, {
       // dateStarted: request.body.dateStarted,
@@ -672,7 +677,7 @@ app.get("/dashboard", checkIsAdmin, async (request, response) => {
   });
 });
 
-app.get("/userDetails", checkIsAdmin, async (request, response) => {
+app.get("/userDetails", checkIsAdmin, csrfProtection, async (request, response) => {
   let selectedUser = null;
   let contactTracingForms = null;
   let monitoringForms = null;
@@ -695,10 +700,11 @@ app.get("/userDetails", checkIsAdmin, async (request, response) => {
     monitoringForms,
     positiveHistory,
     message: request.query.message,
+    csrfToken: request.csrfToken()
   });
 });
 
-app.put("/api/saveNumberOfDaysForQuarantine", checkIsAdmin, async (request, response) => {
+app.put("/api/saveNumberOfDaysForQuarantine", checkIsAdmin, csrfProtection, async (request, response) => {
   const numberOfDaysForQuarantine = Number(request.body.numberOfDaysForQuarantine);
   await updateMonitoringForm(request.body.monitoringFormId, {
     numberOfDaysForQuarantine: numberOfDaysForQuarantine
@@ -802,7 +808,7 @@ app.get(
   }
 );
 
-app.get("/adminsettings", checkIsAdmin, async (request, response) => {
+app.get("/adminsettings", checkIsAdmin, csrfProtection, async (request, response) => {
   const admin = (await getAdmins())[0];
   //console.log(admin);
   response.render("adminsettings", {
@@ -812,13 +818,14 @@ app.get("/adminsettings", checkIsAdmin, async (request, response) => {
     isAdmin: request.session.isAdmin,
     admin,
     message: request.query.message,
+    csrfToken: request.csrfToken()
   });
 });
 
 ///ADMIN
 app.post(
   "/updateAdminDetails",
-  checkIsAdmin,
+  checkIsAdmin, csrfProtection,
   async function (request, response) {
     await updateAdmin(request.body.id, {
       firstName: request.body.firstName,
@@ -837,7 +844,7 @@ app.post(
 
 app.post(
   "/updateAdminUsername",
-  checkIsAdmin,
+  checkIsAdmin, csrfProtection,
   async function (request, response) {
     if (request.body.newUsername !== request.body.confirmUsername) {
       response.redirect(
@@ -857,7 +864,7 @@ app.post(
 
 app.post(
   "/updateAdminPassword",
-  checkIsAdmin,
+  checkIsAdmin, csrfProtection,
   async function (request, response) {
     if (request.body.newPassword !== request.body.confirmPassword) {
       response.redirect(
@@ -881,22 +888,23 @@ app.post(
 );
 
 ///USERS SIDE
-app.get("/profile", checkIsUser, (request, response) => {
+app.get("/profile", checkIsUser, csrfProtection, (request, response) => {
   response.render("profile", {
     title: "Profile",
     pageName: "profile",
     currentUser: request.session.user,
     isAdmin: request.session.isAdmin,
     message: request.query.message,
+    csrfToken: request.csrfToken()
   });
 });
 
-app.post("/profile", checkIsUser, async function (request, response) {
+app.post("/profile", checkIsUser, csrfProtection, async function (request, response) {
   await updateUser(request.session.user.id, {
     firstName: request.body.firstName,
     lastName: request.body.lastName,
     address: request.body.address,
-    phoneNumber: request.body.phoneNumber,
+    phoneNumber: request.body.phoneNumber
   });
 
   request.session.user.firstName = request.body.firstName;
@@ -911,6 +919,7 @@ app.post("/profile", checkIsUser, async function (request, response) {
 app.post(
   "/updateUserDetails",
   checkIsAdmin,
+  csrfProtection,
   async function (request, response) {
     await updateUser(request.body.id, { //body.id is only for update???!!!
       // firstName: request.body.firstName,
@@ -972,7 +981,7 @@ async function deletePositiveHistory(id) {
 }
 
 //ADMIN LOGIN
-app.get("/login-admin", (request, response) => {
+app.get("/login-admin", csrfProtection, (request, response) => {
   if (request.session.isAdmin) {
     response.redirect("/"); //if manually typed, redirects to index page :)
   }
@@ -984,6 +993,7 @@ app.get("/login-admin", (request, response) => {
       currentUser: request.session.user,
       isAdmin: request.session.isAdmin,
       message: request.query.message,
+      csrfToken: request.csrfToken()
     });
   }
 });
@@ -1000,7 +1010,7 @@ app.get("/logout", function (request, response) {
 });
 
 //API LOGIN-USER SIDE
-app.post("/api/login", async function (request, response) {
+app.post("/api/login", csrfProtection, async function (request, response) {
   if (!request.body.username || !request.body.password) {
     response.json({
       success: false,
@@ -1033,7 +1043,7 @@ app.post("/api/login", async function (request, response) {
 });
 
 //API LOGIN-ADMIN SIDE
-app.post("/api/login-admin", async function (request, response) {
+app.post("/api/login-admin", csrfProtection, async function (request, response) {
   if (!request.body.username || !request.body.password) {
     response.json({
       success: false,

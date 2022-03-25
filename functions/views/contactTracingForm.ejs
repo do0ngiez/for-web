@@ -72,6 +72,7 @@
 
   <!-- WHO LIVES WITH YOU PORTION -->
   <form action="/contactTracingForm" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
     <div class="container">
       <div class="bg-addu pt-2 pl-2 pr-2 pb-1">

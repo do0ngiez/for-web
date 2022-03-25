@@ -24,6 +24,7 @@
   <!-- Details -->
 
   <form id="adminForm" action="/updateAdminDetails" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <input type="text" hidden name="id" value="<%= admin.id %>" />
 
     <div class="row">
@@ -121,6 +122,7 @@
           </div>
 
           <form id="usernameForm" action="/updateAdminUsername" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <input type="text" hidden name="id" value="<%= admin.id %>" />
 
           <!-- BODY USERNAME CHANGE -->
@@ -168,7 +170,7 @@
           </div>
           <!-- END BODY -->
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
             <button type="submit" class="btn btn-primary">Save changes</button>
           </div>
         </form>
@@ -191,6 +193,7 @@
           </div>
 
           <form id="usernameForm" action="/updateAdminPassword" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <input type="text" hidden name="id" value="<%= admin.id %>" />
 
           <!-- BODY PASSWORD CHANGE -->
@@ -199,9 +202,9 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
-                  <label for="newUsername"> New Password </label>
+                  <label for="newPassword"> New Password </label>
                   <input
-                    type="text"
+                    type="password"
                     class="form-control"
                     id="newPassword"
                     name="newPassword"
@@ -211,9 +214,9 @@
               </div>
               <div class="col-md-12">
                 <div class="form-group">
-                  <label for="confirmUsername"> Confirm Password </label>
+                  <label for="confirmPassword"> Confirm Password </label>
                   <input
-                    type="text"
+                    type="password"
                     class="form-control"
                     id="confirmPassword"
                     name="confirmPassword"
@@ -225,7 +228,7 @@
           </div>
           <!-- END BODY -->
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
             <button type="submit" class="btn btn-primary">Save changes</button>
           </div>
         </form>
@@ -285,6 +288,16 @@
         $("#newPassword").val("");
         $("#confirmPassword").val("");
       });
+
+      $('#usernameModal').on('hidden.bs.modal', function (e) {
+        $("#newUsername").val('');
+        $("#confirmUsername").val('');
+      })
+
+      $('#passwordModal').on('hidden.bs.modal', function (e) {
+        $("#newPassword").val('');
+        $("#confirmPassword").val('');
+      })
     })(jQuery);
   });
 </script>
