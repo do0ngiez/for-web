@@ -41,20 +41,33 @@
                 </label>
                 <input type="text" id="name" name="name" class="form-control" value="<%= user.firstName %> <%= user.lastName %>" readonly>
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-6">
                 <label for="dateStarted">
                     Date Started
                 </label>
                 <input type="text" id="dateStarted" name="dateStarted" class="form-control" value="<%= monitoringForm?.dateStarted %>" readonly>
             </div>
+        </div>
+        <div class="row">
             <div class="col-md-6">
                 <label for="dateSymptomsStarted">
                     Date symptoms started (if applicable)
                 </label>
                 <input type="text" id="dateSymptomsStarted" name="dateSymptomsStarted" class="form-control datepicker"
                 value="<%= monitoringForm?.dateSymptomsStarted %>" readonly>
+            </div>
+            <div class="col-md-6">
+                <label for="dateExposed">
+                    Date Exposed
+                </label>
+                <input type="text" class="form-control" id="dateExposed" name="dateExposed"
+                    <% if (user.contacts.length > 0) { %>
+                        <% const myList = user.contacts[0].split(", ") %>
+                        <% const myList1 = myList[4].split(" ") %>
+                        value="<%= myList1[0] %>" readonly />
+                    <% } else { %>
+                        value="" readonly />
+                    <% } %> 
             </div>
         </div>
     </div>

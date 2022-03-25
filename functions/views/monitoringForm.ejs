@@ -67,7 +67,15 @@
                             <!-- for exposed people only -->
                             Date Exposed 
                         </label>
-                        <input type="text" id="name" name="name" class="form-control" value="<%= currentUser.firstName %> <%= currentUser.lastName %>" readonly>
+                        <!-- <input type="text" id="name" name="name" class="form-control" value="<%= currentUser.firstName %> <%= currentUser.lastName %>" readonly> -->
+                        <input type="text" class="form-control" id="dateExposed" name="dateExposed"
+                        <% if (currentUser.contacts.length > 0) { %>
+                            <% const myList = currentUser.contacts[0].split(", ") %>
+                            <% const myList1 = myList[4].split(" ") %>
+                            value="<%= myList1[0] %>" readonly />
+                        <% } else { %>
+                            value="" readonly />
+                        <% } %> 
                     </div>
                 </div>
                 <div class="row pt-2">

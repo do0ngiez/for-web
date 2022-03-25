@@ -56,9 +56,13 @@
                 <div class="form-group">
                   <label for="phoneNumber"> Date Exposed </label>
                   <input type="text" class="form-control" id="dateExposed" name="dateExposed"
-                  <% const myList = selectedUser.contacts[0].split(", ") %>
-                  <% const myList1 = myList[4].split(" ") %>
-                    value="<%= myList1[0] %>" readonly />
+                  <% if (selectedUser.contacts.length > 0) { %>
+                    <% const myList = selectedUser.contacts[0].split(", ") %>
+                    <% const myList1 = myList[4].split(" ") %>
+                      value="<%= myList1[0] %>" readonly />
+                  <% } else { %>
+                    value="" readonly />
+                  <% } %> 
                   <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
                 </div>
               </div>
@@ -145,6 +149,7 @@
               <table id="myTable" class="table table-hover table-bordered">
                 <thead style = "background-color: #e6e6e6">
                   <tr>
+                    <th class="d-none">Id</th>
                     <th scope="col">Name</th>
                     <th scope="col">Email</th>
                     <th scope="col">Phone Number</th>
@@ -155,6 +160,9 @@
                   <% selectedUser.contacts.forEach(contact=> { %>
                   <% const myList = contact.split(",") %>
                     <tr>
+                      <td class="d-none">
+                        <%= selectedUser.id %>
+                      </td>
                       <td>
                         <%= myList[0]%>
                       </td>
@@ -257,8 +265,17 @@
   </div>
   <% } %>
 
-    <%- include('./partials/_bottom') %>
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.1/css/jquery.dataTables.css" />
 
+    <script defer type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.js"></script>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+      integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    
+    <%- include('./partials/_bottom') %>
+    
     <script>
       $(document).ready(function() {
         $("#status").val("<%= selectedUser.status %>")

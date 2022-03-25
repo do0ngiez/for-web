@@ -33,7 +33,7 @@
                 <option value="Negative">Negative</option>
               </select>
             </div>
-            <div class="col-md-3">
+            <!-- <div class="col-md-3">
               <label for="fromDateFilter">Date of Contact</label>
               <div class="input-group input-daterange">
                 <input type="text" class="form-control" id="fromDateFilter" value="">
@@ -42,7 +42,7 @@
                 </div>
                 <input type="text" class="form-control" id="toDateFilter" value="">
               </div>
-            </div>
+            </div> -->
             <div class="col-md-3">
               <button class="btn btn-orange-addu" style=" margin-top: 2rem" id="filterButton">Filter Data</button>
             </div>
@@ -56,7 +56,7 @@
             <tr>
               <th class="d-none">Id</th>
               <th scope="col">Full Name</th>
-              <th scope="col">Date of Contact</th>
+              <!-- <th scope="col">Date of Contact</th> -->
               <th scope="col">Status</th>
               <th scope="col">Vaccination Status</th>
             </tr>
@@ -71,11 +71,11 @@
                   <%= user.firstName %>
                     <%= user.lastName %>
                 </td>
-                <td>
+                <!-- <td>
                   <% if (user.timeOfContact) { %>
                   <%= new Date((new Date(user.timeOfContact._seconds * 1000)).getTime() - ((new Date(user.timeOfContact._seconds * 1000)).getTimezoneOffset() * 60000)).toISOString().substring(0, 10) %>
                   <% } %>
-                </td>
+                </td> -->
                 <td>
                   <%= user.status %>
                 </td>
