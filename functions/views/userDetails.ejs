@@ -49,6 +49,7 @@
         <div class="tab-pane fade show active p-4" id="userDetails" role="tabpanel" aria-labelledby="userDetails-tab">
           <!-- UPDATES DETAILS!!!!!!!!!!! -->
           <form action="/updateUserDetails" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <input type="text" hidden name="id" value="<%= selectedUser.id %>" />
 
             <div class="row">
@@ -242,6 +243,7 @@
                           </div>
 
                           <form method="post" action="/completeMonitoringForm">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <input type="hidden" name="userId" value="<%= selectedUser.id %>" />
                             <input type="hidden" name="mId" value="<%= monitoringForm.id %>" />
                             <button type="submit" class="ml-2 btn btn-primary-addu" onclick="return clearbtn()"> Clear</button>
@@ -310,10 +312,12 @@
 
       function saveNumberOfDaysForQuarantine(monitoringFormId) {
         const numberOfDaysForQuarantine = $(`#numberOfDaysForQuarantine${monitoringFormId}`).val();
+        const _csrf = $('input[name="_csrf"]').val();
         
         const data = {
           monitoringFormId,
-          numberOfDaysForQuarantine
+          numberOfDaysForQuarantine,
+          _csrf
         }
 
         fetch('/api/saveNumberOfDaysForQuarantine', {

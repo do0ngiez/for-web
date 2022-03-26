@@ -10,6 +10,7 @@
             </div>
     
             <form id="adminLoginForm">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" class="form-control" name="username" id="adminUsername"
@@ -39,6 +40,7 @@
 
                     const username = $('#adminUsername').val();
                     const password = $('#adminPassword').val();
+                    const _csrf = $('input[name="_csrf"]').val();
 
                     const response = await fetch('/api/login-admin', {
                         method: 'POST',
@@ -47,7 +49,8 @@
                         },
                         body: JSON.stringify({
                             username,
-                            password
+                            password,
+                            _csrf
                         })
                     });
                     const data = await response.json();
