@@ -84,12 +84,23 @@
                     value="<%= selectedUser.lastName %>" readonly />
                 </div>
               </div>
-              <div class="col-md-4">
+              <!-- <div class="col-md-4">
                 <div class="form-group">
                   <label for="phoneNumber"> Vaccination Status </label>
                   <input type="text" class="form-control" id="vacStatus" name="vacStatus"
                     value="<%= selectedUser.vacStatus %>" readonly />
                   <%# SHOULD MATCH WITH DATABASE!!!!!!!!! %>
+                </div>
+              </div> -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="Status"> Vaccination Status </label>
+                  <select class="form-control" name="status" id="status" required>
+                    <option></option>
+                    <option value="Positive">Vaccinated</option>
+                    <option value="Negative">Unvaccinated</option>
+                    <option value="Negative">Pending</option>
+                  </select>
                 </div>
               </div>
 
